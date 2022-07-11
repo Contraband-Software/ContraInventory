@@ -1,0 +1,30 @@
+{
+  "name": "net.cyanseraph.inventorysystem",
+  "version": "1.1.0",
+  "description": "A framework of very bare metal scripts to facilitate inventory systems in your games. It is very easy to hook your own logic in at every point.",
+  "displayName": "CyanInventorySystem",
+  "unity": "2019.1",
+  "type": "framework",
+  "hideInEditor": false,
+  "author": {
+    "name": "sammot",
+    "email": "sam@cyanseraph.net",
+    "url": "https://cyanseraph.net/"
+  },
+  "license": "CC-BY-2.5",
+  "keywords": [
+    "Inventory"
+  ],
+  "samples": [
+    {
+      "displayName": "Prefab Objects",
+      "description": "Contains sample prefabs for the cyan inventory system package.",
+      "path": "Samples~/Prefabs"
+    },
+    {
+      "displayName": "Behaviour Scripts",
+      "description": "Contains sample secondary bahaviour scripts for the cyan inventory system package.",
+      "path": "Samples~/Behaviour"
+    }
+  ]
+}
