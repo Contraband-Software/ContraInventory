@@ -1,5 +1,5 @@
 {
-    "name": "net.cyanseraph.inventorysystem.runtime",
+    "name": "net.cyanseraph.inventorysystem.editor",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace cyanseraph
@@ -9,7 +10,9 @@ namespace cyanseraph
     {
         public class InventorySystemManager : MonoBehaviour
         {
-            private Dictionary<string, InventorySystemContainer> containerIndex = new Dictionary<string, InventorySystemContainer>();
+//#if UNITY_EDITOR
+            
+//#endif
 
             [Header("Prerequisites")]
             [Tooltip("The UI canvas this inventory system operates on")]
@@ -19,6 +22,8 @@ namespace cyanseraph
             public GameObject ContainerContainer;
             public GameObject ItemContainer;
 
+            private Dictionary<string, InventorySystemContainer> containerIndex = new Dictionary<string, InventorySystemContainer>();
+
             private Action<InventorySystemItem> lostItemHandler = (InventorySystemItem item) =>
             {
                 Debug.Log("LOST ITEM: " + item.name + ", Destroying it...");
@@ -27,6 +32,13 @@ namespace cyanseraph
 
             void Awake()
             {
+#if UNITY_EDITOR
+                if (canvas == null)
+                {
+                    throw new Exception("INVENTORY SYSTEM CANVAS NOT ASSIGNED");
+                }
+#endif
+
                 //get a reference cache to all the containers in the system
                 foreach (Transform child in ContainerContainer.transform)
                 {

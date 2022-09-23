@@ -1,6 +1,6 @@
 # Cyan Inventory System
 
-A bare-bones customizable inventory system framework
+A bare-bones, EXTREMELY customizable inventory system framework.
 
 ## Usage
 

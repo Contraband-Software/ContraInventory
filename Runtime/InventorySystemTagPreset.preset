@@ -6,7 +6,7 @@ Preset:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: InventorySystemTagManager
+  m_Name: InventorySystemTagPreset
   m_TargetType:
     m_NativeTypeID: 78
     m_ManagedTypePPtr: {fileID: 0}
@@ -172,4 +172,3 @@ Preset:
     propertyPath: m_SortingLayers.Array.data[0].locked
     value: 0
     objectReference: {fileID: 0}
-  m_ExcludedProperties: []

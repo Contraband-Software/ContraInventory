@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEditor;
 
 namespace cyanseraph
 {
@@ -11,6 +12,10 @@ namespace cyanseraph
     {
         public class InventorySystemContainer : MonoBehaviour
         {
+#if UNITY_EDITOR
+            
+#endif
+
             //events
             [HideInInspector] public UnityEvent event_Refresh = new UnityEvent();
 
