@@ -41,12 +41,17 @@ namespace cyanseraph
             private GameObject slotItem = null;
             private RectTransform rectTransformComponent;
 
+            private Action<InventorySystemItem> LostItemHandler;
 
             private void Awake()
             {
                 gameObject.tag = "InventorySystemSlot";
 
                 rectTransformComponent = GetComponent<RectTransform>();
+            }
+            private void Start()
+            {
+                LostItemHandler = container.manager.GetLostItemHandler();
             }
 
             public RectTransform GetRectTransform()
@@ -92,10 +97,6 @@ namespace cyanseraph
                         itemScript._AddToSlot(this);
                         return true;
                     }
-                    //else
-                    //{
-                    //    return false;
-                    //}
                 } else {
                     InventorySystemSlot itemsPreviousSlot = itemScript.GetPreviousSlot();
                     if (itemsPreviousSlot.GetSlotItem() == null)
@@ -108,8 +109,8 @@ namespace cyanseraph
                     }
                     else
                     {
-                        //destroy item i guess
-                        //call handleStrayItemFunction
+                        //Deal with item
+                        if (LostItemHandler != null) { LostItemHandler(itemScript); };
                     }
                 }
 
@@ -125,7 +126,7 @@ namespace cyanseraph
                     if (!CustomSlotBehaviour.script.CanItemSlot(item))
                     {
 #if UNITY_EDITOR
-                        Debug.Log("SLOT BEHAVIOUR HAS BLOCKED THIS ACTION");
+                        //Debug.Log("SLOT BEHAVIOUR HAS BLOCKED THIS ACTION");
 #endif
                         return false;
                     }

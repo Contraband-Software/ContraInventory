@@ -22,9 +22,9 @@ namespace cyanseraph
             //[HideInInspector] public UnityEvent event_mouseDown = new UnityEvent();
 
             //Prerequisites
-            [Header("Prerequisites")]
-            [Tooltip("The UI canvas this inventory system operates on")]
-            [SerializeField] private Canvas canvas;
+            //[Header("Prerequisites")]
+            //[Tooltip("The UI canvas this inventory system operates on")]
+            private Canvas canvas;
 
             //Settings
             [Header("Settings")]
@@ -78,6 +78,8 @@ namespace cyanseraph
                 rectTransform = GetComponent<RectTransform>();
                 cg = GetComponent<CanvasGroup>();
 
+                canvas = GetComponentInParent<InventorySystemManager>().GetCanvas();
+
                 timer = new System.Timers.Timer(ClickLockingTime);
                 timer.Elapsed += resetFlag;
                 gameObject.tag = "InventorySystemItem";
@@ -116,7 +118,6 @@ namespace cyanseraph
             {
                 _SetCurrentSlot(newSlot);
                 event_Slotted.Invoke();
-
                 MoveToPosition(newSlot.GetRectTransform().anchoredPosition);
 
                 //just in case, could be removed

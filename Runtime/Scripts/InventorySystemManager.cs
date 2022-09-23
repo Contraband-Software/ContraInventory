@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +19,12 @@ namespace cyanseraph
             public GameObject ContainerContainer;
             public GameObject ItemContainer;
 
+            private Action<InventorySystemItem> lostItemHandler = (InventorySystemItem item) =>
+            {
+                Debug.Log("LOST ITEM: " + item.name + ", Destroying it...");
+                Destroy(item.gameObject);
+            };
+
             void Awake()
             {
                 //get a reference cache to all the containers in the system
@@ -31,9 +38,24 @@ namespace cyanseraph
 
                         containerIndex.Add(child.gameObject.name, t);
                     }
+#if UNITY_EDITOR
+                    else
+                    {
+                        throw new System.Exception("NON-InventorySystemContainer GameObject within container heirarchy");
+                    }
+#endif
                 }
 
                 //Debug.Log("Containers: " + containerIndex.Count);
+            }
+
+            public void SetLostItemHandler(Action<InventorySystemItem> handler)
+            {
+                lostItemHandler = handler;
+            }
+            public Action<InventorySystemItem> GetLostItemHandler()
+            {
+                return lostItemHandler;
             }
 
             public InventorySystemContainer GetContainer(string ContainerName)
@@ -44,6 +66,11 @@ namespace cyanseraph
             public Dictionary<string, InventorySystemSlot> GetContainerMap(string ContainerName)
             {
                 return containerIndex[ContainerName].GetContainerMap();
+            }
+
+            public Canvas GetCanvas()
+            {
+                return canvas;
             }
 
             //DOES NOT WORK IF THE ITEM IS NOT ALREADY PARENTED TO THE CANVAS, AS THE RECT TRANSFORM STARTS BEHAVING WEIRDLY

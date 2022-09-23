@@ -14,12 +14,7 @@ public class MySlotBehaviour : cyanseraph.InventorySystem.InventorySystemSlotBeh
     }
     public override bool CanItemSlot(GameObject item)
     {
-        //bool ans = false;
-        //try {
-        //    ans = slotType == item.GetComponent<MyItemBehaviour>().slotType;
-        //} catch {
-        //    Debug.Log("Err: " + item.name);
-        //}
+        //Debug.Log("CanItemSlot: " + slotType.ToString() + " to " + item.GetComponent<MyItemBehaviour>().slotType.ToString());
 
         return slotType == item.GetComponent<MyItemBehaviour>().slotType;//ans;
     }
