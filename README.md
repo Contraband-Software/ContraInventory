@@ -65,12 +65,12 @@ Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, cl
 <p>
     <img src="/Documentation~/README/SlotBehaviour.png"/>
 </p>
-
-!(Slot behaviour setup example)[/Documentation~/README/SlotBehaviour.png]
-
-!(Slot behaviour code example)[/Documentation~/README/SlotBehaviour1.png]
-
-!(Item behaviour setup example)[/Documentation~/README/SlotBehaviour2.png]
+<p>
+    <img src="/Documentation~/README/SlotBehaviour1.png"/>
+</p>
+<p>
+    <img src="/Documentation~/README/SlotBehaviour2.png"/>
+</p>
 
 Now items of type A can only slot in slots with type A. I recommend making a slot and item prefab storing your setup.
 
