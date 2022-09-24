@@ -11,6 +11,7 @@ A bare-bones, EXTREMELY customizable inventory system framework.
  - References to the parent canvas must be added to the inventory manager.
  - ALL ITEMS AND SLOTS MUST HAVE A UNIQUE NAME, otherwise you will get red errors.
  - Only have ONE InventoryManager per scene, undefined behaviour otherwise.
+ - ALL items MUST have a CanvasGroup component, otherwise input will not function.
 
 ### Starting
 
