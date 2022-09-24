@@ -62,6 +62,10 @@ How you define this method is entirely up to you now - you are given the GameObj
 
 Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, click `Enable`, add the referenc eto your slot behaviour script (which should be on the same GameObject). Now you must make your items store their type somehow and access it in the `CanItemSlot` function.
 
+<p>
+    <img src="/Documentation~/README/SlotBehaviour.png" width="220" height="240" />
+</p>
+
 !(Slot behaviour setup example)[/Documentation~/README/SlotBehaviour.png]
 
 !(Slot behaviour code example)[/Documentation~/README/SlotBehaviour1.png]
