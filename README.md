@@ -25,7 +25,7 @@ Every item container must have an `InventorySystemContainer` component.
 
 Every item slot must have an `InventorySystemSlot` component.
 
-Every item  must have an `InventorySystemItem` component.
+Every item  must have an `InventorySystemItem` component (As well as a CanvasGroup).
 
 #### Containers
 
@@ -36,6 +36,12 @@ All of these containers must reside under the `Containers` GameObject under the 
 Right click on the `Containers` container object under the InventorySystem you just created, navigate to `UI > Cyan Inventory > Container`. Give it a nice **UNIQUE** name.
 
 Do not reposition this container if you want to have mutliple containers, it's anchored position must be the same as all other containers in the scene. You must only work with the position of the child item slots.
+
+Containers can be isolated, meaning items from other containers cannot be transferred to it, nor can items from it be transferred to other containers. You can also specify container groups in which items can be transferred. Click a container you have created, under isolation settings, you can enable them and then give it a group string that gorups it with other containers that have that exact same string.
+
+<p>
+    <img src="/Documentation~/README/Isolation.png"/>
+</p>
 
 #### Slots
 
