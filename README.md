@@ -52,7 +52,27 @@ Click the top-level inventory manager, you will see an `InventorySystemInitializ
 
 Now you have an inventory! But currently it only has one item and one slot, so get creative!
 
+### Custom behaviour and rules
+
+All logic for whether an item can enter a slot is done within the slot component, so, add a new script to a slot, make it inherit from the abstract class `cyanseraph.InventorySystem.InventorySystemSlotBehaviour`.
+
+You will now implement the method `public bool CanItemSlot(GameObject item);` on your script, otherwise it will not compile.
+
+How you define this method is entirely up to you now - you are given the GameObject of the item trying to slot, so you can access your own scripts storing type information on them; the way I will do it is with a public enum defining *item type*, an item will have an item type and a slot will have an accepted item type. (In the image below I have also added some logic to change some child text on the item slot to its type)
+
+Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, click `Enable`, add the referenc eto your slot behaviour script (which should be on the same GameObject). Now you must make your items store their type somehow and access it in the `CanItemSlot` function.
+
+!(Slot behaviour setup example)[Documentation~/README/SlotBehaviour.png]
+
+!(Slot behaviour code example)[Documentation~/README/SlotBehaviour1.png]
+
+!(Item behaviour setup example)[Documentation~/README/SlotBehaviour2.png]
+
+Now items of type A can only slot in slots with type A. I recommend making a slot and item prefab storing your setup.
+
 ### Programatic access to the inventory, its containers, and slots
+
+The inventory manager component on the top-level inventory system gameobject exposes many methods for accessing containers and gettting lists of items, spawning items in specific slots, etc.
 
 ## Best practices
 
