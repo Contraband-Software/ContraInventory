@@ -62,11 +62,11 @@ How you define this method is entirely up to you now - you are given the GameObj
 
 Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, click `Enable`, add the referenc eto your slot behaviour script (which should be on the same GameObject). Now you must make your items store their type somehow and access it in the `CanItemSlot` function.
 
-!(Slot behaviour setup example)[Documentation~/README/SlotBehaviour.png]
+!(Slot behaviour setup example)[/Documentation~/README/SlotBehaviour.png]
 
-!(Slot behaviour code example)[Documentation~/README/SlotBehaviour1.png]
+!(Slot behaviour code example)[/Documentation~/README/SlotBehaviour1.png]
 
-!(Item behaviour setup example)[Documentation~/README/SlotBehaviour2.png]
+!(Item behaviour setup example)[/Documentation~/README/SlotBehaviour2.png]
 
 Now items of type A can only slot in slots with type A. I recommend making a slot and item prefab storing your setup.
 
