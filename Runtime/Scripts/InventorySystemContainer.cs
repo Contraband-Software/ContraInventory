@@ -12,10 +12,6 @@ namespace cyanseraph
     {
         public class InventorySystemContainer : MonoBehaviour
         {
-#if UNITY_EDITOR
-            
-#endif
-
             //events
             [HideInInspector] public UnityEvent event_Refresh = new UnityEvent();
 
@@ -54,6 +50,9 @@ namespace cyanseraph
                 {
                     //Debug.Log("S: IC TGV");
                     bool res = IS._InitSlotItem(Item);
+
+                    ContainerRefresh();
+
                     return res;
                 }
 

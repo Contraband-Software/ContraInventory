@@ -78,13 +78,15 @@ namespace cyanseraph
                 rectTransform = GetComponent<RectTransform>();
                 cg = GetComponent<CanvasGroup>();
 
-                canvas = GetComponentInParent<InventorySystemManager>().GetCanvas();
-
                 timer = new System.Timers.Timer(ClickLockingTime);
                 timer.Elapsed += resetFlag;
                 gameObject.tag = "InventorySystemItem";
 
                 desiredPosition = rectTransform.anchoredPosition;
+            }
+            private void Start()
+            {
+                canvas = GetComponentInParent<InventorySystemManager>().GetCanvas();
             }
 
             /// <summary>

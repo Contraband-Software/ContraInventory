@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class MySlotBehaviour : cyanseraph.InventorySystem.InventorySystemSlotBehaviour
+public class MySlotBehaviour : MonoBehaviour, cyanseraph.InventorySystem.InventorySystemSlotBehaviour
 {
     public Enums.SlotType slotType = Enums.SlotType.A;
 
@@ -12,7 +12,7 @@ public class MySlotBehaviour : cyanseraph.InventorySystem.InventorySystemSlotBeh
     {
         te.GetComponent<TextMeshProUGUI>().text = slotType.ToString();
     }
-    public override bool CanItemSlot(GameObject item)
+    public bool CanItemSlot(GameObject item)
     {
         //Debug.Log("CanItemSlot: " + slotType.ToString() + " to " + item.GetComponent<MyItemBehaviour>().slotType.ToString());
 

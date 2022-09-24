@@ -16,6 +16,8 @@ public class GameObjectMenu : MonoBehaviour
     {
         prefab.name = name;
 
+        PrefabUtility.UnpackPrefabInstance(prefab, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
         if (Selection.activeTransform != null)
         {
             prefab.transform.SetParent(Selection.activeTransform, false);

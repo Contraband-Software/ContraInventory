@@ -7,7 +7,7 @@ public class TestScript : MonoBehaviour
     public cyanseraph.InventorySystem.InventorySystemManager IM;
 
     public GameObject item;
-    public Canvas c;
+    //public Canvas c;
 
     private cyanseraph.InventorySystem.InventorySystemContainer IC;
 
@@ -16,13 +16,13 @@ public class TestScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        IC = IM.GetContainer("ContainerTest");
+        IC = IM.GetContainer("Container1");
         IC.event_Refresh.AddListener(onRefresh);
 
         newItem = Instantiate(item);
         newItem.name = "newItem3";
 
-        Debug.Log(IM.AddItem("ContainerTest", "TestSlot", newItem));
+        Debug.Log(IM.AddItem("ContainerTest", "Slot_C_1", newItem));
 
         //works: Debug.Log(IM.GetContainer("ContainerTest").GetItems().Count);
     }
