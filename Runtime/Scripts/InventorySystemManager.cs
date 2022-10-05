@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,8 +16,8 @@ namespace cyanseraph
             [SerializeField] private Canvas canvas;
 
             [Header("Inventory Object Containers")]
-            public GameObject ContainerContainer;
-            public GameObject ItemContainer;
+            [SerializeField] GameObject ContainerContainer;
+            [SerializeField] GameObject ItemContainer;
 
             private Dictionary<string, InventorySystemContainer> containerIndex = new Dictionary<string, InventorySystemContainer>();
 
