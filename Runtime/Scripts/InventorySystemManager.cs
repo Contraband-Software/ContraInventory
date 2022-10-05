@@ -10,10 +10,6 @@ namespace cyanseraph
     {
         public class InventorySystemManager : MonoBehaviour
         {
-//#if UNITY_EDITOR
-            
-//#endif
-
             [Header("Prerequisites")]
             [Tooltip("The UI canvas this inventory system operates on")]
             [SerializeField] private Canvas canvas;
@@ -57,8 +53,6 @@ namespace cyanseraph
                     }
 #endif
                 }
-
-                //Debug.Log("Containers: " + containerIndex.Count);
             }
 
             public void SetLostItemHandler(Action<InventorySystemItem> handler)
@@ -97,22 +91,20 @@ namespace cyanseraph
             /// <returns>Whether the slotting was successful or not</returns>
             public bool AddItem(string ContainerName, string SlotName, GameObject Item)
             {
-                Item.transform.parent = canvas.transform;
+                Item.transform.SetParent(ItemContainer.transform);
                 Item.GetComponent<cyanseraph.InventorySystem.InventorySystemItem>().SetCanvas(canvas);
 
                 InventorySystemContainer IC;
                 if (containerIndex.TryGetValue(ContainerName, out IC))
                 {
+                    //Debug.Log("IM: TryGetValue - CONTAINER FOUND; " + ContainerName);
                     if (IC._AddItemToSlot(SlotName, Item))
                     {
-                        //Debug.Log("S: IM ICAI");
-                        Item.transform.SetParent(ItemContainer.transform);
                         return true;
                     }
 
                     return false;
                 }
-                //Debug.Log("F: IM TG");
 
                 return false;
             }

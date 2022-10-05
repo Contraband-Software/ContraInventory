@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class TestScript : MonoBehaviour
@@ -19,10 +20,11 @@ public class TestScript : MonoBehaviour
         IC = IM.GetContainer("Container1");
         IC.event_Refresh.AddListener(onRefresh);
 
-        newItem = Instantiate(item);
+        newItem = Instantiate(item);//, IM.GetCanvas().transform);
         newItem.name = "newItem3";
+        newItem.GetComponent<MyItemBehaviour>().slotType = Enums.SlotType.C;
 
-        Debug.Log(IM.AddItem("ContainerTest", "Slot_C_1", newItem));
+        //Debug.Log("ADD ITEM (EXTERNAL): " + IM.AddItem("ContainerTest", "Slot_C_1", newItem));
 
         //works: Debug.Log(IM.GetContainer("ContainerTest").GetItems().Count);
     }
@@ -35,7 +37,7 @@ public class TestScript : MonoBehaviour
         {
             listofitems += item.name + ", ";
         }
-        Debug.Log(listofitems);
+        //Debug.Log(listofitems);
     }
 
     // Update is called once per frame

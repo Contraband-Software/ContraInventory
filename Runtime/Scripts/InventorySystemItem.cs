@@ -9,6 +9,10 @@ namespace cyanseraph
 {
     namespace InventorySystem
     {
+        [
+            RequireComponent(typeof(RectTransform)), 
+            RequireComponent(typeof(CanvasGroup))
+        ]
         public class InventorySystemItem : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
         {
             //Events
@@ -30,7 +34,7 @@ namespace cyanseraph
             [Header("Settings")]
             [Min(0), Tooltip("The time in milliseconds to wait inbetween handling click events, should be at least 1000")]
             [SerializeField] private int ClickLockingTime = 1000;
-            [Range(0, 1), Tooltip("The speed at which a 'floating/flying' item travels to its target slot")]
+            [Range(0, 1), Tooltip("The speed at which a 'floating/flying' item travels to its target slot. 1 is instant.")]
             [SerializeField] private float PingTravelSpeed = 0.1f;
             [Min(0), Tooltip("The distance between an item and its target slot at which it just snaps into the target slot")]
             [SerializeField] private float FlyingItemSnapThreshold = 6.0f;
@@ -47,9 +51,9 @@ namespace cyanseraph
             }
             [Header("Game Options")]
             [Tooltip("The type of the item, such as 'wooden-block'")]
-            public string ItemTypeIdentifier = "Default";
-            [Tooltip("If the item is to be stackable, it must have a defined unique identifier.")]
-            public OptionalAttr StackOptions;
+            //public string ItemTypeIdentifier = "Default";
+            //[Tooltip("If the item is to be stackable, it must have a defined unique identifier.")]
+            //public OptionalAttr StackOptions;
 
             //State
             private RectTransform rectTransform;

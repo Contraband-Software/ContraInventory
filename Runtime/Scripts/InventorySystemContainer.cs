@@ -43,20 +43,27 @@ namespace cyanseraph
                 return itemSlotIndex;
             }
 
+            /// <summary>
+            /// Programatically adding item to slot
+            /// </summary>
+            /// <param name="SlotName"></param>
+            /// <param name="Item"></param>
+            /// <returns></returns>
             public bool _AddItemToSlot(string SlotName, GameObject Item)
             {
                 InventorySystemSlot IS;
                 if (itemSlotIndex.TryGetValue(SlotName, out IS))
                 {
-                    //Debug.Log("S: IC TGV");
+                    //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
                     bool res = IS._InitSlotItem(Item);
+
+                    //Debug.Log("slot.init res: " + res.ToString());
 
                     ContainerRefresh();
 
                     return res;
                 }
 
-                //Debug.Log("F: IC TG");
                 return false;
             }
 
@@ -99,7 +106,6 @@ namespace cyanseraph
                         }
                     }
                 }
-                //Debug.Log(transform.name + ", Slots: " + itemSlotIndex.Count);
             }
         }
     }

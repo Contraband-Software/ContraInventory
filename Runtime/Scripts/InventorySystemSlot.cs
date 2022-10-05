@@ -9,6 +9,7 @@ namespace cyanseraph
 {
     namespace InventorySystem
     {
+        [RequireComponent(typeof(RectTransform))]
         public class InventorySystemSlot : MonoBehaviour, IDropHandler, IDragHandler
         {
             //Events
@@ -64,6 +65,7 @@ namespace cyanseraph
             {
                 if (slotItem == null && AddItemToSlot(item))
                 {
+                    //Debug.Log("Slot allowed item: " + item.name);
                     item.GetComponent<InventorySystemItem>()._InitSlot(this);
                     return true;
                 }
@@ -80,6 +82,10 @@ namespace cyanseraph
                 InventorySystemItem itemScript = item.GetComponent<InventorySystemItem>();
 
                 //isolation
+                if (itemScript.GetPreviousSlot() == null)
+                {
+                    throw new System.Exception("itemScript.GetPreviousSlot() == null");
+                }
                 InventorySystemContainer previousSlotContainer = itemScript.GetPreviousSlot().container;
                 if (container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
                 {//if either are isolated
@@ -126,7 +132,7 @@ namespace cyanseraph
                     if (!CustomSlotBehaviour.script.CanItemSlot(item))
                     {
 #if UNITY_EDITOR
-                        //Debug.Log("SLOT BEHAVIOUR HAS BLOCKED THIS ACTION");
+                        Debug.Log(gameObject.name + ": SLOT BEHAVIOUR HAS BLOCKED THIS ATTEMPTED INSERT: " + item.name);
 #endif
                         return false;
                     }

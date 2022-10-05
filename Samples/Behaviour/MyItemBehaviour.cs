@@ -32,6 +32,6 @@ public class MyItemBehaviour : MonoBehaviour
         II.event_Unslotted.AddListener(startDrag);
         II.event_Slotted.AddListener(endDrag);
 
-        II.ItemTypeIdentifier = slotType.ToString();
+        //II.ItemTypeIdentifier = slotType.ToString();
     }
 }
