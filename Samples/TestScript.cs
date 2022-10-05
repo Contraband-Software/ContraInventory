@@ -24,7 +24,7 @@ public class TestScript : MonoBehaviour
         newItem.name = "newItem3";
         newItem.GetComponent<MyItemBehaviour>().slotType = Enums.SlotType.C;
 
-        //Debug.Log("ADD ITEM (EXTERNAL): " + IM.AddItem("ContainerTest", "Slot_C_1", newItem));
+        Debug.Log("ADD ITEM (EXTERNAL): " + IM.AddItem("ContainerTest", "Slot_C_1", newItem));
 
         //works: Debug.Log(IM.GetContainer("ContainerTest").GetItems().Count);
     }
