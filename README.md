@@ -12,6 +12,8 @@ A bare-bones, EXTREMELY customizable inventory system framework.
  - ALL ITEMS AND SLOTS MUST HAVE A UNIQUE NAME, otherwise you will get red errors.
  - Only have ONE InventoryManager per scene, undefined behaviour otherwise.
  - ALL items MUST have a CanvasGroup component, otherwise input will not function.
+ 
+ - Currently, mixing items/slots with and without custom defined behaviour is untested, do at your own risk
 
 ### Starting
 
@@ -67,7 +69,7 @@ You will now implement the method `public bool CanItemSlot(GameObject item);` on
 
 How you define this method is entirely up to you now - you are given the GameObject of the item trying to slot, so you can access your own scripts storing type information on them; the way I will do it is with a public enum defining *item type*, an item will have an item type and a slot will have an accepted item type. (In the image below I have also added some logic to change some child text on the item slot to its type)
 
-Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, click `Enable`, add the referenc eto your slot behaviour script (which should be on the same GameObject). Now you must make your items store their type somehow and access it in the `CanItemSlot` function.
+Go back to your slot gameobject, under the `Custom Slot Behaviour` drop down, click `Enable`, add the reference to your slot behaviour script (which should be on the same GameObject). Now you must make your items store their type somehow and access it in the `CanItemSlot` function.
 
 <p>
     <img src="/Documentation~/README/SlotBehaviour.png"/>
