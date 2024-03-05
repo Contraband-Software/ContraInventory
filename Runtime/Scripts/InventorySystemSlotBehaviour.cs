@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         public abstract class InventorySystemSlotBehaviour : MonoBehaviour
         {
