@@ -1,4 +1,4 @@
-# Cyan Inventory System
+# ContraInventory
 
 A bare-bones, EXTREMELY customizable inventory system framework.
 
