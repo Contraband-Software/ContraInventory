@@ -5,9 +5,9 @@ using UnityEngine.EventSystems;
 using System;
 using UnityEngine.Events;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         [RequireComponent(typeof(RectTransform))]
         public class InventorySystemSlot : MonoBehaviour, IDropHandler, IDragHandler
