@@ -5,9 +5,9 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         public class InventorySystemManager : MonoBehaviour
         {
