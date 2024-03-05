@@ -5,9 +5,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         [
             RequireComponent(typeof(RectTransform)), 
