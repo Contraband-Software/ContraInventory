@@ -1,5 +1,5 @@
 {
-    "name": "net.cyanseraph.inventorysystem.runtime",
+    "name": "software.contraband.contrainventory.runtime",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
