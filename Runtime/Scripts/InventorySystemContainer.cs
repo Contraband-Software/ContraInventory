@@ -6,9 +6,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEditor;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         public class InventorySystemContainer : MonoBehaviour
         {
