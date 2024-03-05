@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace cyanseraph
+namespace Contra
 {
-    namespace InventorySystem
+    namespace Inventory
     {
         public class InventorySystemInitializer : MonoBehaviour
         {
