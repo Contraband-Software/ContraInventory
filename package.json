@@ -1,15 +1,15 @@
 {
-  "name": "net.cyanseraph.inventorysystem",
+  "name": "software.contraband.contrainventory",
   "version": "1.1.0",
   "description": "A framework of very bare metal scripts to facilitate inventory systems in your games. It is very easy to hook your own logic in at every point.",
-  "displayName": "CyanInventorySystem",
+  "displayName": "ContraInventory",
   "unity": "2019.1",
   "type": "framework",
   "hideInEditor": false,
   "author": {
-    "name": "cyanseraph",
-    "email": "sam@cyanseraph.net",
-    "url": "https://cyanseraph.net/"
+    "name": "Sam Taseff",
+    "email": "sgttaseff1@sheffield.ac.uk",
+    "url": "https://contraband.software/"
   },
   "keywords": [
     "Inventory"
