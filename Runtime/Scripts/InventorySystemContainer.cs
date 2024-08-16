@@ -6,104 +6,101 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEditor;
 
-namespace Contra
+namespace Software.Contraband.Inventory
 {
-    namespace Inventory
+    public class InventorySystemContainer : MonoBehaviour
     {
-        public class InventorySystemContainer : MonoBehaviour
+        //events
+        [HideInInspector] public UnityEvent event_Refresh = new UnityEvent();
+
+        //settings
+        [Serializable]
+        public class OptionalIsolationSettings
         {
-            //events
-            [HideInInspector] public UnityEvent event_Refresh = new UnityEvent();
+            public bool Enabled = false;
+            public string Identifier = "Default";
+        }
 
-            //settings
-            [Serializable]
-            public class OptionalIsolationSettings
+        [Tooltip("Disallow item transfer from this container to other containers and vice versa.")]
+        public OptionalIsolationSettings IsolationSettings;
+
+        //state
+        private Dictionary<string, InventorySystemSlot> itemSlotIndex = new Dictionary<string, InventorySystemSlot>();
+
+        private List<GameObject> itemCache = new List<GameObject>();
+
+        [HideInInspector] public InventorySystemManager manager = null;
+
+        public List<GameObject> GetRawItemsList()
+        {
+            return itemCache;
+        }
+
+        public Dictionary<string, InventorySystemSlot> GetContainerMap()
+        {
+            return itemSlotIndex;
+        }
+
+        /// <summary>
+        /// Programatically adding item to slot
+        /// </summary>
+        /// <param name="SlotName"></param>
+        /// <param name="Item"></param>
+        /// <returns></returns>
+        public bool _AddItemToSlot(string SlotName, GameObject Item)
+        {
+            InventorySystemSlot IS;
+            if (itemSlotIndex.TryGetValue(SlotName, out IS))
             {
-                public bool Enabled = false;
-                public string Identifier = "Default";
+                //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
+                bool res = IS._InitSlotItem(Item);
+
+                //Debug.Log("slot.init res: " + res.ToString());
+
+                ContainerRefresh();
+
+                return res;
             }
 
-            [Tooltip("Disallow item transfer from this container to other containers and vice versa.")]
-            public OptionalIsolationSettings IsolationSettings;
+            return false;
+        }
 
-            //state
-            private Dictionary<string, InventorySystemSlot> itemSlotIndex = new Dictionary<string, InventorySystemSlot>();
+        private void ContainerRefresh()
+        {
+            itemCache.Clear();
 
-            private List<GameObject> itemCache = new List<GameObject>();
-
-            [HideInInspector] public InventorySystemManager manager = null;
-
-            public List<GameObject> GetRawItemsList()
+            foreach (KeyValuePair<string, InventorySystemSlot> child in itemSlotIndex)
             {
-                return itemCache;
-            }
-
-            public Dictionary<string, InventorySystemSlot> GetContainerMap()
-            {
-                return itemSlotIndex;
-            }
-
-            /// <summary>
-            /// Programatically adding item to slot
-            /// </summary>
-            /// <param name="SlotName"></param>
-            /// <param name="Item"></param>
-            /// <returns></returns>
-            public bool _AddItemToSlot(string SlotName, GameObject Item)
-            {
-                InventorySystemSlot IS;
-                if (itemSlotIndex.TryGetValue(SlotName, out IS))
+                GameObject slotItem = child.Value.GetSlotItem();
+                if (slotItem != null)
                 {
-                    //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
-                    bool res = IS._InitSlotItem(Item);
-
-                    //Debug.Log("slot.init res: " + res.ToString());
-
-                    ContainerRefresh();
-
-                    return res;
+                    itemCache.Add(slotItem);
                 }
-
-                return false;
             }
 
-            private void ContainerRefresh()
-            {
-                itemCache.Clear();
+            event_Refresh.Invoke();
+        }
 
-                foreach (KeyValuePair<string, InventorySystemSlot> child in itemSlotIndex)
+        void Awake()
+        {
+            //grab a reference to the item slot script for all the item slots in this container,
+            //as well as initialising the item cache, and adding its own reference and event handlers
+            foreach (Transform child in transform)
+            {
+                InventorySystemSlot t;
+                if (child.gameObject.TryGetComponent<InventorySystemSlot>(out t))
                 {
-                    GameObject slotItem = child.Value.GetSlotItem();
+                    itemSlotIndex.Add(child.gameObject.name, t);
+
+                    t.container = this;
+
+                    t.event_Slotted.AddListener(ContainerRefresh);
+                    t.event_Unslotted.AddListener(ContainerRefresh);
+
+                    GameObject slotItem = t.GetSlotItem();
                     if (slotItem != null)
                     {
                         itemCache.Add(slotItem);
-                    }
-                }
-
-                event_Refresh.Invoke();
-            }
-
-            void Awake()
-            {
-                //grab a reference to the item slot script for all the item slots in this container,
-                //as well as initialising the item cache, and adding its own reference and event handlers
-                foreach (Transform child in transform)
-                {
-                    InventorySystemSlot t;
-                    if (child.gameObject.TryGetComponent<InventorySystemSlot>(out t))
-                    {
-                        itemSlotIndex.Add(child.gameObject.name, t);
-
-                        t.container = this;
-
-                        t.event_Slotted.AddListener(ContainerRefresh);
-                        t.event_Unslotted.AddListener(ContainerRefresh);
-
-                        GameObject slotItem = t.GetSlotItem();
-                        if (slotItem != null)
-                        {
-                            itemCache.Add(slotItem);
-                        }
                     }
                 }
             }

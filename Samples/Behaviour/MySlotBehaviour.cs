@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class MySlotBehaviour : cyanseraph.InventorySystem.InventorySystemSlotBehaviour
+public class MySlotBehaviour : Software.Contraband.Inventory.InventorySystemSlotBehaviour
 {
     public Enums.SlotType slotType = Enums.SlotType.A;
 

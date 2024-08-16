@@ -1,5 +1,6 @@
 {
-    "name": "software.contraband.contrainventory.runtime",
+    "name": "software.contraband.inventories.runtime",
+    "rootNamespace": "Software.Contraband.Inventory",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

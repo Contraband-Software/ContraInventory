@@ -3,29 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace Contra
+namespace Software.Contraband.Inventory
 {
-    namespace Inventory
+    public class InventorySystemInitializer : MonoBehaviour
     {
-        public class InventorySystemInitializer : MonoBehaviour
+        [Serializable]
+        public struct SlotItemPair
         {
-            [Serializable]
-            public struct SlotItemPair
-            {
-                public cyanseraph.InventorySystem.InventorySystemSlot ItemSlot;
-                public GameObject Item;
-            }
+            public InventorySystemSlot ItemSlot;
+            public GameObject Item;
+        }
 
-            public List<SlotItemPair> Population = new List<SlotItemPair>();
+        public List<SlotItemPair> Population = new List<SlotItemPair>();
 
-            void Start()
+        void Start()
+        {
+            foreach (SlotItemPair pair in Population)
             {
-                foreach (SlotItemPair pair in Population)
+                if (!pair.ItemSlot._InitSlotItem(pair.Item))
                 {
-                    if (!pair.ItemSlot._InitSlotItem(pair.Item))
-                    {
-                        Debug.LogException(new Exception("Cannot init item to this slot"));
-                    }
+                    Debug.LogException(new Exception("Cannot init item to this slot"));
                 }
             }
         }

@@ -1,5 +1,6 @@
 {
-    "name": "software.contraband.contrainventory.editor",
+    "name": "software.contraband.inventories.editor",
+    "rootNamespace": "Software.Contraband.Inventory",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class TestScript : MonoBehaviour
 {
-    public cyanseraph.InventorySystem.InventorySystemManager IM;
+    public Software.Contraband.Inventory.InventorySystemManager IM;
 
     public GameObject item;
     //public Canvas c;
 
-    private cyanseraph.InventorySystem.InventorySystemContainer IC;
+    private Software.Contraband.Inventory.InventorySystemContainer IC;
 
     private GameObject newItem;
 

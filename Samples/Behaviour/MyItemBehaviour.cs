@@ -11,7 +11,7 @@ public class MyItemBehaviour : MonoBehaviour
 
     private CanvasGroup cg;
 
-    private cyanseraph.InventorySystem.InventorySystemItem II;
+    private Software.Contraband.Inventory.InventorySystemItem II;
 
     private void startDrag()
     {
@@ -27,7 +27,7 @@ public class MyItemBehaviour : MonoBehaviour
         cg = GetComponent<CanvasGroup>();
         te.GetComponent<TextMeshProUGUI>().text = slotType.ToString();
 
-        II = GetComponent<cyanseraph.InventorySystem.InventorySystemItem>();
+        II = GetComponent<Software.Contraband.Inventory.InventorySystemItem>();
 
         II.event_Unslotted.AddListener(startDrag);
         II.event_Slotted.AddListener(endDrag);
