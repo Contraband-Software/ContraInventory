@@ -32,7 +32,7 @@ public class TestScript : MonoBehaviour
     void onRefresh()
     {
         string listofitems = "";
-        List<GameObject> items = IC.GetRawItemsList();
+        List<GameObject> items = IC.GetItemsList();
         foreach (GameObject item in items)
         {
             listofitems += item.name + ", ";

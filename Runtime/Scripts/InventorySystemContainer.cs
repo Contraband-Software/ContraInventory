@@ -21,17 +21,17 @@ namespace Software.Contraband.Inventory
             public string Identifier = "Default";
         }
 
-        [Tooltip("Disallow item transfer from this container to other containers and vice versa.")]
-        public OptionalIsolationSettings IsolationSettings;
+        [Tooltip("Limit item transfer only to containers with this identifier")]
+        [field: SerializeField] public OptionalIsolationSettings IsolationSettings { get; private set; }
 
         //state
         private Dictionary<string, InventorySystemSlot> itemSlotIndex = new Dictionary<string, InventorySystemSlot>();
 
         private List<GameObject> itemCache = new List<GameObject>();
 
-        [HideInInspector] public InventorySystemManager manager = null;
+        internal InventorySystemManager manager = null;
 
-        public List<GameObject> GetRawItemsList()
+        public List<GameObject> GetItemsList()
         {
             return itemCache;
         }
@@ -47,7 +47,7 @@ namespace Software.Contraband.Inventory
         /// <param name="SlotName"></param>
         /// <param name="Item"></param>
         /// <returns></returns>
-        public bool _AddItemToSlot(string SlotName, GameObject Item)
+        internal bool _AddItemToSlot(string SlotName, GameObject Item)
         {
             InventorySystemSlot IS;
             if (itemSlotIndex.TryGetValue(SlotName, out IS))

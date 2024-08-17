@@ -58,6 +58,7 @@ namespace Software.Contraband.Inventory
         {
             lostItemHandler = handler;
         }
+        
         public Action<InventorySystemItem> GetLostItemHandler()
         {
             return lostItemHandler;
@@ -78,11 +79,9 @@ namespace Software.Contraband.Inventory
             return canvas;
         }
 
-        //DOES NOT WORK IF THE ITEM IS NOT ALREADY PARENTED TO THE CANVAS, AS THE RECT TRANSFORM STARTS BEHAVING WEIRDLY
-        // Be warned that the item MUST ALREADY BE PARENTED TO THE CANVAS OF THE INVENTORY SYSTEM
-
         /// <summary>
         /// Takes in an item and adds it to the given slot of the given container, as well as parenting the object to the item container Object.
+        /// The item gameObject must already be parented to the same canvas as the target inventory system.
         /// </summary>
         /// <param name="ContainerName"></param>
         /// <param name="SlotName"></param>

@@ -9,17 +9,11 @@ namespace Software.Contraband.Inventory
 {
     [
         RequireComponent(typeof(RectTransform)), 
-        RequireComponent(typeof(CanvasGroup))
+        RequireComponent(typeof(CanvasGroup)),
+        SelectionBase
     ]
     public class InventorySystemItem : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
     {
-        //Events
-        //the object has been removed from its slot
-        [HideInInspector] public UnityEvent event_Unslotted = new UnityEvent();
-        //The object was sent back to its original slot
-        [HideInInspector] public UnityEvent event_Reslotted = new UnityEvent();
-        //the object is in a new slot
-        [HideInInspector] public UnityEvent event_Slotted = new UnityEvent();
         //the object is just clicked, not dragged
         //[HideInInspector] public UnityEvent event_mouseDown = new UnityEvent();
 
@@ -29,15 +23,15 @@ namespace Software.Contraband.Inventory
         private Canvas canvas;
 
         //Settings
-        [Header("Settings")]
-        [Min(0), Tooltip("The time in milliseconds to wait inbetween handling click events, should be at least 1000")]
+        [Header("Settings"), Space(10)]
+        [Min(50), Tooltip("(Immutable at runtime) The time in milliseconds to wait inbetween handling click events, lower means more instability")]
         [SerializeField] private int ClickLockingTime = 1000;
-        [Range(0, 1), Tooltip("The speed at which a 'floating/flying' item travels to its target slot. 1 is instant.")]
+        [Range(0, 1), Tooltip("The speed at which a floating (user has stopped dragging it) item travels to its target slot. 1 is instant")]
         [SerializeField] private float PingTravelSpeed = 0.1f;
-        [Min(0), Tooltip("The distance between an item and its target slot at which it just snaps into the target slot")]
+        [Min(1), Tooltip("The distance between an item and its target slot at which it snaps into the target slot and ceases floating")]
         [SerializeField] private float FlyingItemSnapThreshold = 6.0f;
 
-        [Tooltip("Only allow the left click for dragging items")]
+        [Tooltip("Only allow the left click for dragging items, can sometimes get weird if disabled")]
         [SerializeField] private bool LimitDragClick = true;
 
         //Options
@@ -47,11 +41,20 @@ namespace Software.Contraband.Inventory
             public bool Stackable = false;
             public float MaximumAmount = 1;
         }
-        [Header("Game Options")]
-        [Tooltip("The type of the item, such as 'wooden-block'")]
+        // [Header("Game Options")]
+        // [Tooltip("The type of the item, such as 'wooden-block'")]
         //public string ItemTypeIdentifier = "Default";
         //[Tooltip("If the item is to be stackable, it must have a defined unique identifier.")]
         //public OptionalAttr StackOptions;
+        
+        //Events
+        [Header("Events"), Space(10)]
+        //the object has been removed from its slot
+        public UnityEvent event_Unslotted = new UnityEvent();
+        //The object was sent back to its original slot
+        public UnityEvent event_Reslotted = new UnityEvent();
+        //the object is in a new slot
+        public UnityEvent event_Slotted = new UnityEvent();
 
         //State
         private RectTransform rectTransform;
@@ -96,7 +99,7 @@ namespace Software.Contraband.Inventory
         /// Just spawns an item in a slot
         /// </summary>
         /// <param name="newSlot"></param>
-        public void _InitSlot(InventorySystemSlot newSlot)
+        internal void _InitSlot(InventorySystemSlot newSlot)
         {
             previousSlot = newSlot;
             slot = newSlot;
@@ -121,7 +124,7 @@ namespace Software.Contraband.Inventory
         /// For the slot script to bind the item
         /// </summary>
         /// <param name="newSlot"></param>
-        public void _AddToSlot(InventorySystemSlot newSlot)
+        internal void _AddToSlot(InventorySystemSlot newSlot)
         {
             _SetCurrentSlot(newSlot);
             event_Slotted.Invoke();
@@ -234,20 +237,13 @@ namespace Software.Contraband.Inventory
             desiredPosition = pos;
         }
 
-        private void FixedUpdate()
-        {
-            if (!isBeingDragged)// && isFlying == false)
-            {
-                Vector2 diff = desiredPosition - rectTransform.anchoredPosition;
-                if (diff.magnitude > FlyingItemSnapThreshold) {
-                    rectTransform.anchoredPosition += (diff) * PingTravelSpeed;
-                } else
-                {
-                    rectTransform.anchoredPosition = desiredPosition;
-                    isFlying = false;
-                }
-            }
-        }
+        // private void FixedUpdate()
+        // {
+        //     if (!isBeingDragged)// && isFlying == false)
+        //     {
+        //
+        //     }
+        // }
 
         private void Update()
         {
@@ -262,6 +258,17 @@ namespace Software.Contraband.Inventory
                 {
                     cg.blocksRaycasts = true;
                 }
+                
+                #region FLYING
+                Vector2 diff = desiredPosition - rectTransform.anchoredPosition;
+                if (diff.magnitude > FlyingItemSnapThreshold) {
+                    rectTransform.anchoredPosition += (diff) * PingTravelSpeed;
+                } else
+                {
+                    rectTransform.anchoredPosition = desiredPosition;
+                    isFlying = false;
+                }
+                #endregion
             }
         }
 

@@ -10,9 +10,6 @@ namespace Software.Contraband.Inventory
     [RequireComponent(typeof(RectTransform))]
     public class InventorySystemSlot : MonoBehaviour, IDropHandler, IDragHandler
     {
-        //Events
-        [HideInInspector] public UnityEvent event_Slotted = new UnityEvent();
-        [HideInInspector] public UnityEvent event_Unslotted = new UnityEvent();
 
         //Settings
         //[Serializable]
@@ -30,13 +27,18 @@ namespace Software.Contraband.Inventory
             public InventorySystemSlotBehaviour script = null;
         }
 
-        [Header("Settings")]
+        [Header("Settings"), Space(10)]
         [Tooltip("Custom script object that inherits from InventoryManager.SlotBehaviour to define checks on how this slot should accept items.")]
         [SerializeField] private OptionalScript CustomSlotBehaviour;
         //public StackSettings stackSettings;
+        
+        //Events
+        [Header("Events"), Space(10)]
+        public UnityEvent event_Slotted = new UnityEvent();
+        public UnityEvent event_Unslotted = new UnityEvent();
 
         //State
-        [HideInInspector] public InventorySystemContainer container = null;
+        internal InventorySystemContainer container = null;
         private GameObject slotItem = null;
         private RectTransform rectTransformComponent;
 
@@ -59,7 +61,7 @@ namespace Software.Contraband.Inventory
         }
 
         //for spawning an item to a slot
-        public bool _InitSlotItem(GameObject item)
+        internal bool _InitSlotItem(GameObject item)
         {
             if (slotItem == null && AddItemToSlot(item))
             {
@@ -78,13 +80,14 @@ namespace Software.Contraband.Inventory
         public bool SetSlotItem(GameObject item)
         {
             InventorySystemItem itemScript = item.GetComponent<InventorySystemItem>();
+            InventorySystemSlot itemsPreviousSlot = itemScript.GetPreviousSlot();
 
             //isolation
-            if (itemScript.GetPreviousSlot() == null)
+            if (itemsPreviousSlot == null)
             {
-                throw new System.Exception("itemScript.GetPreviousSlot() == null");
+                throw new InvalidOperationException("itemScript.GetPreviousSlot() == null");
             }
-            InventorySystemContainer previousSlotContainer = itemScript.GetPreviousSlot().container;
+            InventorySystemContainer previousSlotContainer = itemsPreviousSlot.container;
             if (container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
             {//if either are isolated
                 //compare identifiers
@@ -102,7 +105,7 @@ namespace Software.Contraband.Inventory
                     return true;
                 }
             } else {
-                InventorySystemSlot itemsPreviousSlot = itemScript.GetPreviousSlot();
+                
                 if (itemsPreviousSlot.GetSlotItem() == null)
                 {
                     if (itemsPreviousSlot.SetSlotItem(slotItem) && AddItemToSlot(item))

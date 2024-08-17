@@ -14,7 +14,7 @@ namespace Software.Contraband.Inventory
             public GameObject Item;
         }
 
-        public List<SlotItemPair> Population = new List<SlotItemPair>();
+        [SerializeField] List<SlotItemPair> Population = new List<SlotItemPair>();
 
         void Start()
         {
