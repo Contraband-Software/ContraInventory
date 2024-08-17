@@ -5,13 +5,22 @@ using System;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEditor;
+using UnityEngine.Serialization;
+using System;
 
 namespace Software.Contraband.Inventory
 {
+    public enum SlotAction
+    {
+        Added,
+        Removed
+    }
+    
     public class InventorySystemContainer : MonoBehaviour
     {
         //events
-        [HideInInspector] public UnityEvent event_Refresh = new UnityEvent();
+        [FormerlySerializedAs("event_Refresh")] [HideInInspector] 
+        public UnityEvent<SlotAction, GameObject> eventRefresh = new();
 
         //settings
         [Serializable]
@@ -64,7 +73,7 @@ namespace Software.Contraband.Inventory
 
             return false;
         }
-
+        
         private void ContainerRefresh()
         {
             itemCache.Clear();
@@ -77,8 +86,13 @@ namespace Software.Contraband.Inventory
                     itemCache.Add(slotItem);
                 }
             }
+        }
+        
+        private void ContainerRefreshEvent(SlotAction action, GameObject item)
+        {
+            ContainerRefresh();
 
-            event_Refresh.Invoke();
+            eventRefresh.Invoke(action, item);
         }
 
         void Awake()
@@ -94,8 +108,8 @@ namespace Software.Contraband.Inventory
 
                     t.container = this;
 
-                    t.event_Slotted.AddListener(ContainerRefresh);
-                    t.event_Unslotted.AddListener(ContainerRefresh);
+                    t.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, t.GetSlotItem()));
+                    t.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, t.GetSlotItem()));
 
                     GameObject slotItem = t.GetSlotItem();
                     if (slotItem != null)

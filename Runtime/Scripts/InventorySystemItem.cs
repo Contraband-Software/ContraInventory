@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System;
+using UnityEngine.Serialization;
 
 namespace Software.Contraband.Inventory
 {
@@ -12,7 +13,9 @@ namespace Software.Contraband.Inventory
         RequireComponent(typeof(CanvasGroup)),
         SelectionBase
     ]
-    public class InventorySystemItem : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
+    public class InventorySystemItem : 
+        MonoBehaviour, 
+        IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
     {
         //the object is just clicked, not dragged
         //[HideInInspector] public UnityEvent event_mouseDown = new UnityEvent();
@@ -24,11 +27,20 @@ namespace Software.Contraband.Inventory
 
         //Settings
         [Header("Settings"), Space(10)]
-        [Min(50), Tooltip("(Immutable at runtime) The time in milliseconds to wait inbetween handling click events, lower means more instability")]
+        
+        [Min(50), Tooltip(
+             "(Immutable at runtime) The time in milliseconds to wait " +
+             "between handling click events, lower means more instability")]
         [SerializeField] private int ClickLockingTime = 1000;
-        [Range(0, 1), Tooltip("The speed at which a floating (user has stopped dragging it) item travels to its target slot. 1 is instant")]
+        
+        [Range(0, 1), Tooltip(
+             "The speed at which a floating (user has stopped dragging it) " +
+             "item travels to its target slot. 1 is instant")]
         [SerializeField] private float PingTravelSpeed = 0.1f;
-        [Min(1), Tooltip("The distance between an item and its target slot at which it snaps into the target slot and ceases floating")]
+        
+        [Min(1), Tooltip(
+             "The distance between an item and its target slot at which it snaps " +
+             "into the target slot and ceases floating")]
         [SerializeField] private float FlyingItemSnapThreshold = 6.0f;
 
         [Tooltip("Only allow the left click for dragging items, can sometimes get weird if disabled")]
@@ -49,12 +61,14 @@ namespace Software.Contraband.Inventory
         
         //Events
         [Header("Events"), Space(10)]
+        
+        [FormerlySerializedAs("event_Unslotted")]
         //the object has been removed from its slot
-        public UnityEvent event_Unslotted = new UnityEvent();
+        public UnityEvent eventUnslotted = new UnityEvent();
         //The object was sent back to its original slot
-        public UnityEvent event_Reslotted = new UnityEvent();
+        [FormerlySerializedAs("event_Reslotted")] public UnityEvent eventReslotted = new UnityEvent();
         //the object is in a new slot
-        public UnityEvent event_Slotted = new UnityEvent();
+        [FormerlySerializedAs("event_Slotted")] public UnityEvent eventSlotted = new UnityEvent();
 
         //State
         private RectTransform rectTransform;
@@ -71,7 +85,7 @@ namespace Software.Contraband.Inventory
         //Event locking
         private bool buttonLocked;
         private System.Timers.Timer timer;
-        private void resetFlag(object source, System.Timers.ElapsedEventArgs e)
+        private void ResetFlag(object source, System.Timers.ElapsedEventArgs e)
         {
             buttonLocked = false;
             timer.Enabled = false;
@@ -84,7 +98,7 @@ namespace Software.Contraband.Inventory
             cg = GetComponent<CanvasGroup>();
 
             timer = new System.Timers.Timer(ClickLockingTime);
-            timer.Elapsed += resetFlag;
+            timer.Elapsed += ResetFlag;
             gameObject.tag = "InventorySystemItem";
 
             desiredPosition = rectTransform.anchoredPosition;
@@ -127,7 +141,7 @@ namespace Software.Contraband.Inventory
         internal void _AddToSlot(InventorySystemSlot newSlot)
         {
             _SetCurrentSlot(newSlot);
-            event_Slotted.Invoke();
+            eventSlotted.Invoke();
             MoveToPosition(newSlot.GetRectTransform().anchoredPosition);
 
             //just in case, could be removed
@@ -187,7 +201,7 @@ namespace Software.Contraband.Inventory
                 _SetCurrentSlot(null);
 
                 //fire events
-                event_Unslotted.Invoke();
+                eventUnslotted.Invoke();
             }
             else
             {
@@ -211,7 +225,7 @@ namespace Software.Contraband.Inventory
                 _SetCurrentSlot(previousSlot);
 
                 //fire events
-                event_Reslotted.Invoke();
+                eventReslotted.Invoke();
             }
 
             ToggleDrag(false);
@@ -231,7 +245,7 @@ namespace Software.Contraband.Inventory
             //Debug.Log("Pointer Up");
         }
 
-        public void MoveToPosition(Vector2 pos)
+        private void MoveToPosition(Vector2 pos)
         {
             isFlying = true;
             desiredPosition = pos;
@@ -248,28 +262,20 @@ namespace Software.Contraband.Inventory
         private void Update()
         {
             //so the slot drop event can be fired even if it is occupied for swapping
-            if (!isBeingDragged)
-            {
-                if (Input.GetMouseButton(0))
-                {
-                    cg.blocksRaycasts = false;
-                }
-                else
-                {
-                    cg.blocksRaycasts = true;
-                }
+            if (isBeingDragged) return;
+            
+            cg.blocksRaycasts = !Input.GetMouseButton(0);
                 
-                #region FLYING
-                Vector2 diff = desiredPosition - rectTransform.anchoredPosition;
-                if (diff.magnitude > FlyingItemSnapThreshold) {
-                    rectTransform.anchoredPosition += (diff) * PingTravelSpeed;
-                } else
-                {
-                    rectTransform.anchoredPosition = desiredPosition;
-                    isFlying = false;
-                }
-                #endregion
+            #region FLYING
+            Vector2 diff = desiredPosition - rectTransform.anchoredPosition;
+            if (diff.magnitude > FlyingItemSnapThreshold) {
+                rectTransform.anchoredPosition += (diff) * PingTravelSpeed;
+            } else
+            {
+                rectTransform.anchoredPosition = desiredPosition;
+                isFlying = false;
             }
+            #endregion
         }
 
         private void ToggleDrag(bool status)

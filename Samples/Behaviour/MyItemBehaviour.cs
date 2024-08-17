@@ -29,8 +29,8 @@ public class MyItemBehaviour : MonoBehaviour
 
         II = GetComponent<Software.Contraband.Inventory.InventorySystemItem>();
 
-        II.event_Unslotted.AddListener(startDrag);
-        II.event_Slotted.AddListener(endDrag);
+        II.eventUnslotted.AddListener(startDrag);
+        II.eventSlotted.AddListener(endDrag);
 
         //II.ItemTypeIdentifier = slotType.ToString();
     }

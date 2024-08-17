@@ -14,12 +14,16 @@ namespace Software.Contraband.Inventory
             public GameObject Item;
         }
 
-        [SerializeField] List<SlotItemPair> Population = new List<SlotItemPair>();
+        [SerializeField] List<SlotItemPair> Population = new();
 
-        void Start()
+        private void Start()
         {
             foreach (SlotItemPair pair in Population)
             {
+#if UNITY_EDITOR
+                if (!pair.Item.TryGetComponent<InventorySystemItem>(out _))
+                    throw new InvalidOperationException("Tried to initialize slot with a non-item gameObject");
+#endif
                 if (!pair.ItemSlot._InitSlotItem(pair.Item))
                 {
                     Debug.LogException(new Exception("Cannot init item to this slot"));

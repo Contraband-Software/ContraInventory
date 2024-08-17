@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Software.Contraband.Inventory;
 using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public class TestScript : MonoBehaviour
     void Start()
     {
         IC = IM.GetContainer("Container1");
-        IC.event_Refresh.AddListener(onRefresh);
+        IC.eventRefresh.AddListener((_, _) => onRefresh());
 
         newItem = Instantiate(item);//, IM.GetCanvas().transform);
         newItem.name = "newItem3";

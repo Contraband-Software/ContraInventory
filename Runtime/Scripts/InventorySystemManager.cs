@@ -10,18 +10,20 @@ namespace Software.Contraband.Inventory
     public class InventorySystemManager : MonoBehaviour
     {
         [Header("Prerequisites")]
-        [Tooltip("The UI canvas this inventory system operates on")]
+        
+        [Tooltip("The UI canvas this inventory system operates on, should be a direct parent for a clean project")]
         [SerializeField] private Canvas canvas;
 
         [Header("Inventory Object Containers")]
+        
         [SerializeField] GameObject ContainerContainer;
         [SerializeField] GameObject ItemContainer;
 
-        private Dictionary<string, InventorySystemContainer> containerIndex = new Dictionary<string, InventorySystemContainer>();
+        private Dictionary<string, InventorySystemContainer> containerIndex = new ();
 
         private Action<InventorySystemItem> lostItemHandler = (InventorySystemItem item) =>
         {
-            Debug.Log("LOST ITEM: " + item.name + ", Destroying it...");
+            Debug.LogWarning("Lost Item: " + item.name + ", Destroying it...");
             Destroy(item.gameObject);
         };
 
@@ -30,7 +32,7 @@ namespace Software.Contraband.Inventory
 #if UNITY_EDITOR
             if (canvas == null)
             {
-                throw new Exception("INVENTORY SYSTEM CANVAS NOT ASSIGNED");
+                throw new InvalidOperationException("Inventory system canvas not assigned");
             }
 #endif
 
@@ -48,7 +50,8 @@ namespace Software.Contraband.Inventory
 #if UNITY_EDITOR
                 else
                 {
-                    throw new System.Exception("NON-InventorySystemContainer GameObject within container heirarchy");
+                    throw new InvalidOperationException(
+                        "NON-InventorySystemContainer GameObject within container hierarchy");
                 }
 #endif
             }
@@ -80,7 +83,8 @@ namespace Software.Contraband.Inventory
         }
 
         /// <summary>
-        /// Takes in an item and adds it to the given slot of the given container, as well as parenting the object to the item container Object.
+        /// Takes in an item and adds it to the given slot of the given container,
+        /// as well as parenting the object to the item container Object.
         /// The item gameObject must already be parented to the same canvas as the target inventory system.
         /// </summary>
         /// <param name="ContainerName"></param>
