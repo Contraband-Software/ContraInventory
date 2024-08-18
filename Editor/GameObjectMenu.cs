@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using System.IO;
 
 namespace Software.Contraband.Inventory
 {
-    public class GameObjectMenu : MonoBehaviour
+    public class GameObjectMenu : Editor
     {
         private static string GetPackagePath()
         {

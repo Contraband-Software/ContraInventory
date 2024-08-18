@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Software.Contraband.Inventory;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class TestScript : MonoBehaviour
