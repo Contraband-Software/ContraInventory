@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Software.Contraband.Inventory
 {
-    public abstract class IInventorySystemSlotBehaviour : MonoBehaviour
+    public abstract class AbstractSlotBehaviour : MonoBehaviour
     {
         /// <summary>
         /// Custom logic for whether an item can be put in a certain slot,
@@ -12,7 +12,7 @@ namespace Software.Contraband.Inventory
         /// </summary>
         /// <param name="item">The item being added to this slot</param>
         /// <returns>Whether the item can be put here or not</returns>
-        public abstract bool CanItemSlot(InventorySystemSlot slot, GameObject item);//, GameObject slot
+        public abstract bool CanItemSlot(Slot slot, GameObject item);//, GameObject slot
     }
 }
 

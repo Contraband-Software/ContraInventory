@@ -4,7 +4,7 @@ using Software.Contraband.Inventory;
 using UnityEngine;
 using TMPro;
 
-public class MySlotBehaviour : Software.Contraband.Inventory.IInventorySystemSlotBehaviour
+public class MySlotBehaviour : Software.Contraband.Inventory.AbstractSlotBehaviour
 {
     public Enums.SlotType slotType = Enums.SlotType.A;
 
@@ -13,7 +13,7 @@ public class MySlotBehaviour : Software.Contraband.Inventory.IInventorySystemSlo
     {
         te.GetComponent<TextMeshProUGUI>().text = slotType.ToString();
     }
-    public override bool CanItemSlot(InventorySystemSlot _, GameObject item)
+    public override bool CanItemSlot(Slot _, GameObject item)
     {
         return slotType == item.GetComponent<MyItemBehaviour>().slotType;
     }

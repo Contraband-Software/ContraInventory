@@ -13,7 +13,7 @@ namespace Software.Contraband.Inventory
         RequireComponent(typeof(CanvasGroup)),
         SelectionBase
     ]
-    public class InventorySystemItem : 
+    public class Item : 
         MonoBehaviour, 
         IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
     {
@@ -76,9 +76,9 @@ namespace Software.Contraband.Inventory
 
         private Vector2 desiredPosition;
 
-        private InventorySystemSlot previousSlot = null;
-        private InventorySystemSlot previousFloatSlot = null;
-        private InventorySystemSlot slot = null;
+        private Slot previousSlot = null;
+        private Slot previousFloatSlot = null;
+        private Slot slot = null;
 
         private bool isBeingDragged = false;
         private bool isFlying = false;
@@ -107,14 +107,14 @@ namespace Software.Contraband.Inventory
         
         private void Start()
         {
-            canvas = GetComponentInParent<InventorySystemManager>().GetCanvas();
+            canvas = GetComponentInParent<InventoryContainersManager>().GetCanvas();
         }
 
         /// <summary>
         /// Just spawns an item in a slot
         /// </summary>
         /// <param name="newSlot"></param>
-        internal void _InitSlot(InventorySystemSlot newSlot)
+        internal void _InitSlot(Slot newSlot)
         {
             SetPreviousSlot(newSlot);
             slot = newSlot;
@@ -125,13 +125,13 @@ namespace Software.Contraband.Inventory
             desiredPosition = newSlot.GetRectTransform().anchoredPosition;
         }
         
-        private void SetPreviousSlot(InventorySystemSlot newSlot)
+        private void SetPreviousSlot(Slot newSlot)
         {
             previousSlot = newSlot;
             previousFloatSlot = newSlot;
         }
         
-        private void _SetCurrentSlot(InventorySystemSlot newSlot)
+        private void _SetCurrentSlot(Slot newSlot)
         {
             slot = newSlot;
         }
@@ -140,7 +140,7 @@ namespace Software.Contraband.Inventory
         /// For the slot script to bind the item
         /// </summary>
         /// <param name="newSlot"></param>
-        internal void _AddToSlot(InventorySystemSlot newSlot)
+        internal void _AddToSlot(Slot newSlot)
         {
             _SetCurrentSlot(newSlot);
             eventSlotted.Invoke();
@@ -154,9 +154,9 @@ namespace Software.Contraband.Inventory
 
         public void SetCanvas(Canvas newcanvas) => canvas = newcanvas;
 
-        public InventorySystemSlot GetCurrentSlot() => slot;
+        public Slot GetCurrentSlot() => slot;
 
-        public InventorySystemSlot GetPreviousSlot() => previousSlot;
+        public Slot GetPreviousSlot() => previousSlot;
 
         /// <summary>
         /// Only difference between this and GetPreviousSlot() is that it is set to GetCurrentSlot() after it
@@ -164,7 +164,7 @@ namespace Software.Contraband.Inventory
         /// container as that slot.
         /// </summary>
         /// <returns></returns>
-        public InventorySystemSlot GetPreviousFloatSlot() => previousFloatSlot;
+        public Slot GetPreviousFloatSlot() => previousFloatSlot;
 
         //event handlers
         public void OnBeginDrag(PointerEventData eventData)

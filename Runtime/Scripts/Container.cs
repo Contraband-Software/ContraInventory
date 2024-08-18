@@ -16,7 +16,7 @@ namespace Software.Contraband.Inventory
         Removed
     }
     
-    public class InventorySystemContainer : MonoBehaviour
+    public class Container : MonoBehaviour
     {
         //events
         [FormerlySerializedAs("event_Refresh")] [HideInInspector] 
@@ -34,18 +34,18 @@ namespace Software.Contraband.Inventory
         [field: SerializeField] public OptionalIsolationSettings IsolationSettings { get; private set; }
 
         //state
-        private Dictionary<string, InventorySystemSlot> itemSlotIndex = new Dictionary<string, InventorySystemSlot>();
+        private Dictionary<string, Slot> itemSlotIndex = new Dictionary<string, Slot>();
 
         private List<GameObject> itemCache = new List<GameObject>();
 
-        internal InventorySystemManager manager = null;
+        internal InventoryContainersManager manager = null;
 
         public List<GameObject> GetItemsList()
         {
             return itemCache;
         }
 
-        public Dictionary<string, InventorySystemSlot> GetContainerMap()
+        public Dictionary<string, Slot> GetContainerMap()
         {
             return itemSlotIndex;
         }
@@ -58,7 +58,7 @@ namespace Software.Contraband.Inventory
         /// <returns></returns>
         internal bool _AddItemToSlot(string SlotName, GameObject Item)
         {
-            InventorySystemSlot IS;
+            Slot IS;
             if (itemSlotIndex.TryGetValue(SlotName, out IS))
             {
                 //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
@@ -80,7 +80,7 @@ namespace Software.Contraband.Inventory
             
             itemCache.Clear();
 
-            foreach (KeyValuePair<string, InventorySystemSlot> child in itemSlotIndex)
+            foreach (KeyValuePair<string, Slot> child in itemSlotIndex)
             {
                 GameObject slotItem = child.Value.GetSlotItem();
                 if (slotItem != null)
@@ -97,8 +97,8 @@ namespace Software.Contraband.Inventory
             //as well as initialising the item cache, and adding its own reference and event handlers
             foreach (Transform child in transform)
             {
-                InventorySystemSlot t;
-                if (child.gameObject.TryGetComponent<InventorySystemSlot>(out t))
+                Slot t;
+                if (child.gameObject.TryGetComponent<Slot>(out t))
                 {
                     itemSlotIndex.Add(child.gameObject.name, t);
 

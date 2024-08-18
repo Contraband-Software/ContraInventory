@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Software.Contraband.Inventory
 {
-    public class InventorySystemManager : MonoBehaviour
+    public class InventoryContainersManager : MonoBehaviour
     {
         [Header("Prerequisites")]
         
@@ -19,9 +19,9 @@ namespace Software.Contraband.Inventory
         [SerializeField] GameObject ContainerContainer;
         [SerializeField] GameObject ItemContainer;
 
-        private Dictionary<string, InventorySystemContainer> containerIndex = new ();
+        private Dictionary<string, Container> containerIndex = new ();
 
-        private Action<InventorySystemItem> lostItemHandler = (InventorySystemItem item) =>
+        private Action<Item> lostItemHandler = (Item item) =>
         {
             Debug.LogWarning("Lost Item: " + item.name + ", Destroying it...");
             Destroy(item.gameObject);
@@ -39,8 +39,8 @@ namespace Software.Contraband.Inventory
             //get a reference cache to all the containers in the system
             foreach (Transform child in ContainerContainer.transform)
             {
-                InventorySystemContainer t;
-                if (child.gameObject.TryGetComponent<InventorySystemContainer>(out t))
+                Container t;
+                if (child.gameObject.TryGetComponent<Container>(out t))
                 {
                     //containers.Add(t);
                     t.manager = this;
@@ -57,22 +57,22 @@ namespace Software.Contraband.Inventory
             }
         }
 
-        public void SetLostItemHandler(Action<InventorySystemItem> handler)
+        public void SetLostItemHandler(Action<Item> handler)
         {
             lostItemHandler = handler;
         }
         
-        public Action<InventorySystemItem> GetLostItemHandler()
+        public Action<Item> GetLostItemHandler()
         {
             return lostItemHandler;
         }
 
-        public InventorySystemContainer GetContainer(string ContainerName)
+        public Container GetContainer(string ContainerName)
         {
             return containerIndex[ContainerName];
         }
 
-        public Dictionary<string, InventorySystemSlot> GetContainerMap(string ContainerName)
+        public Dictionary<string, Slot> GetContainerMap(string ContainerName)
         {
             return containerIndex[ContainerName].GetContainerMap();
         }
@@ -94,9 +94,9 @@ namespace Software.Contraband.Inventory
         public bool AddItem(string ContainerName, string SlotName, GameObject Item)
         {
             Item.transform.SetParent(ItemContainer.transform);
-            Item.GetComponent<InventorySystemItem>().SetCanvas(canvas);
+            Item.GetComponent<Item>().SetCanvas(canvas);
 
-            InventorySystemContainer IC;
+            Container IC;
             if (containerIndex.TryGetValue(ContainerName, out IC))
             {
                 //Debug.Log("IM: TryGetValue - CONTAINER FOUND; " + ContainerName);

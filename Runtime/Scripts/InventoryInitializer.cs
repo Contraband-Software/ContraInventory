@@ -5,12 +5,12 @@ using System;
 
 namespace Software.Contraband.Inventory
 {
-    public class InventorySystemInitializer : MonoBehaviour
+    public class InventoryInitializer : MonoBehaviour
     {
         [Serializable]
         public struct SlotItemPair
         {
-            public InventorySystemSlot ItemSlot;
+            public Slot ItemSlot;
             public GameObject Item;
         }
 
@@ -21,7 +21,7 @@ namespace Software.Contraband.Inventory
             foreach (SlotItemPair pair in Population)
             {
 #if UNITY_EDITOR
-                if (!pair.Item.TryGetComponent<InventorySystemItem>(out _))
+                if (!pair.Item.TryGetComponent<Item>(out _))
                     throw new InvalidOperationException("Tried to initialize slot with a non-item gameObject");
 #endif
                 if (!pair.ItemSlot._InitSlotItem(pair.Item))

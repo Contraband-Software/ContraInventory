@@ -12,7 +12,7 @@ namespace Software.Contraband.Inventory
         RequireComponent(typeof(RectTransform)),
         SelectionBase
     ]
-    public class InventorySystemSlot : MonoBehaviour, IDropHandler, IDragHandler
+    public class Slot : MonoBehaviour, IDropHandler, IDragHandler
     {
 
         //Settings
@@ -28,7 +28,7 @@ namespace Software.Contraband.Inventory
         public class OptionalScript
         {
             public bool Enabled = false;
-            public IInventorySystemSlotBehaviour script = null;
+            public AbstractSlotBehaviour script = null;
         }
 
         [Header("Settings"), Space(10)]
@@ -44,11 +44,11 @@ namespace Software.Contraband.Inventory
         [FormerlySerializedAs("event_Unslotted")] public UnityEvent eventUnslotted = new UnityEvent();
 
         //State
-        public InventorySystemContainer Container { get; internal set; } = null;
+        public Container Container { get; internal set; } = null;
         private GameObject slotItem = null;
         private RectTransform rectTransformComponent;
 
-        private Action<InventorySystemItem> LostItemHandler;
+        private Action<Item> LostItemHandler;
 
         private void Awake()
         {
@@ -80,7 +80,7 @@ namespace Software.Contraband.Inventory
             if (slotItem != null || !CheckCustomBehaviour(item)) return false;
             AddItemToSlot(item);
             //Debug.Log("Slot allowed item: " + item.name);
-            item.GetComponent<InventorySystemItem>()._InitSlot(this);
+            item.GetComponent<Item>()._InitSlot(this);
             return true;
 
             //Debug.Log("init: " + item.name + " " + gameObject.name);
@@ -89,15 +89,15 @@ namespace Software.Contraband.Inventory
         //for moving an item from another slot
         public bool SetSlotItem(GameObject item)
         {
-            InventorySystemItem itemScript = item.GetComponent<InventorySystemItem>();
-            InventorySystemSlot itemsPreviousSlot = itemScript.GetPreviousSlot();
+            Item itemScript = item.GetComponent<Item>();
+            Slot itemsPreviousSlot = itemScript.GetPreviousSlot();
 
             //isolation
             if (itemsPreviousSlot == null)
             {
                 throw new InvalidOperationException("itemScript.GetPreviousSlot() == null");
             }
-            InventorySystemContainer previousSlotContainer = itemsPreviousSlot.Container;
+            Container previousSlotContainer = itemsPreviousSlot.Container;
             if (Container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
             {//if either are isolated
                 //compare identifiers

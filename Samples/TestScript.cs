@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class TestScript : MonoBehaviour
 {
-    public Software.Contraband.Inventory.InventorySystemManager IM;
+    public Software.Contraband.Inventory.InventoryContainersManager IM;
 
     public GameObject item;
     //public Canvas c;
 
-    private Software.Contraband.Inventory.InventorySystemContainer IC;
+    private Software.Contraband.Inventory.Container IC;
 
     private GameObject newItem;
 
