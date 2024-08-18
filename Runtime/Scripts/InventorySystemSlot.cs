@@ -44,7 +44,7 @@ namespace Software.Contraband.Inventory
         [FormerlySerializedAs("event_Unslotted")] public UnityEvent eventUnslotted = new UnityEvent();
 
         //State
-        internal InventorySystemContainer container = null;
+        public InventorySystemContainer Container { get; internal set; } = null;
         private GameObject slotItem = null;
         private RectTransform rectTransformComponent;
 
@@ -60,13 +60,13 @@ namespace Software.Contraband.Inventory
         {
 #if UNITY_EDITOR
             // ReSharper disable once Unity.NoNullPropagation
-            if (container?.manager is null)
+            if (Container?.manager is null)
             {
                 throw new InvalidOperationException(
                     "A container hierarchy may only be one level deep, and only composed of slots.");
             }
 #endif
-            LostItemHandler = container.manager.GetLostItemHandler();
+            LostItemHandler = Container.manager.GetLostItemHandler();
         }
 
         public RectTransform GetRectTransform()
@@ -97,33 +97,41 @@ namespace Software.Contraband.Inventory
             {
                 throw new InvalidOperationException("itemScript.GetPreviousSlot() == null");
             }
-            InventorySystemContainer previousSlotContainer = itemsPreviousSlot.container;
-            if (container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
+            InventorySystemContainer previousSlotContainer = itemsPreviousSlot.Container;
+            if (Container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
             {//if either are isolated
                 //compare identifiers
-                if (previousSlotContainer.IsolationSettings.Identifier != container.IsolationSettings.Identifier)
+                if (previousSlotContainer.IsolationSettings.Identifier != Container.IsolationSettings.Identifier)
                 {
                     return false;
                 }
             }
+            
+            // print("isolation passed");
             
             if (!CheckCustomBehaviour(item)) return false;
 
             // empty slot
             if (slotItem == null)
             {
-                AddItemToSlot(item);
+                // print("slot empty");
                 itemScript._AddToSlot(this);
+                AddItemToSlot(item);
                 return true;
             }
+            
+            // print("slot blocked");
 
             // empty source slot means we can swap the items
             if (itemsPreviousSlot.GetSlotItem() == null)
             {
+                // print("prev slot available");
+                
                 // try to swap the items
                 if (!itemsPreviousSlot.SetSlotItem(slotItem)) return false;
-                AddItemToSlot(item);
+                
                 itemScript._AddToSlot(this);
+                AddItemToSlot(item);
                 return true;
             }
 
@@ -158,9 +166,9 @@ namespace Software.Contraband.Inventory
         internal void UnsetSlotItem()
         {
             //slotItem.GetComponent<InventorySystemItem>().SetSlot(null);
-            eventUnslotted.Invoke();
-            
             slotItem = null;
+            
+            eventUnslotted.Invoke();
         }
 
         public void DestroyItem()

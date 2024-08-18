@@ -66,7 +66,7 @@ namespace Software.Contraband.Inventory
 
                 //Debug.Log("slot.init res: " + res.ToString());
 
-                ContainerRefresh();
+                ContainerRefreshEvent(SlotAction.Added, Item);
 
                 return res;
             }
@@ -74,8 +74,10 @@ namespace Software.Contraband.Inventory
             return false;
         }
         
-        private void ContainerRefresh()
+        private void ContainerRefreshEvent(SlotAction action, GameObject item)
         {
+            // print("Refresh: " + item.name);
+            
             itemCache.Clear();
 
             foreach (KeyValuePair<string, InventorySystemSlot> child in itemSlotIndex)
@@ -86,12 +88,6 @@ namespace Software.Contraband.Inventory
                     itemCache.Add(slotItem);
                 }
             }
-        }
-        
-        private void ContainerRefreshEvent(SlotAction action, GameObject item)
-        {
-            ContainerRefresh();
-
             eventRefresh.Invoke(action, item);
         }
 
@@ -106,7 +102,7 @@ namespace Software.Contraband.Inventory
                 {
                     itemSlotIndex.Add(child.gameObject.name, t);
 
-                    t.container = this;
+                    t.Container = this;
 
                     t.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, t.GetSlotItem()));
                     t.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, t.GetSlotItem()));

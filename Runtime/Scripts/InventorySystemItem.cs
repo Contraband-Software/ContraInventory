@@ -77,6 +77,7 @@ namespace Software.Contraband.Inventory
         private Vector2 desiredPosition;
 
         private InventorySystemSlot previousSlot = null;
+        private InventorySystemSlot previousFloatSlot = null;
         private InventorySystemSlot slot = null;
 
         private bool isBeingDragged = false;
@@ -115,7 +116,7 @@ namespace Software.Contraband.Inventory
         /// <param name="newSlot"></param>
         internal void _InitSlot(InventorySystemSlot newSlot)
         {
-            previousSlot = newSlot;
+            SetPreviousSlot(newSlot);
             slot = newSlot;
 
             //MoveToPosition(newSlot.GetRectTransform().anchoredPosition);
@@ -127,6 +128,7 @@ namespace Software.Contraband.Inventory
         private void SetPreviousSlot(InventorySystemSlot newSlot)
         {
             previousSlot = newSlot;
+            previousFloatSlot = newSlot;
         }
         
         private void _SetCurrentSlot(InventorySystemSlot newSlot)
@@ -146,21 +148,23 @@ namespace Software.Contraband.Inventory
 
             //just in case, could be removed
             ToggleDrag(false);
+            
+            previousFloatSlot = newSlot;
         }
 
-        public void SetCanvas(Canvas newcanvas)
-        {
-            canvas = newcanvas;
-        }
+        public void SetCanvas(Canvas newcanvas) => canvas = newcanvas;
 
-        public InventorySystemSlot GetCurrentSlot()
-        {
-            return slot;
-        }
-        public InventorySystemSlot GetPreviousSlot()
-        {
-            return previousSlot;
-        }
+        public InventorySystemSlot GetCurrentSlot() => slot;
+
+        public InventorySystemSlot GetPreviousSlot() => previousSlot;
+
+        /// <summary>
+        /// Only difference between this and GetPreviousSlot() is that it is set to GetCurrentSlot() after it
+        /// has settled in a slot, useful for custom slot behaviours who want to check if an item was from the same
+        /// container as that slot.
+        /// </summary>
+        /// <returns></returns>
+        public InventorySystemSlot GetPreviousFloatSlot() => previousFloatSlot;
 
         //event handlers
         public void OnBeginDrag(PointerEventData eventData)
