@@ -60,13 +60,13 @@ namespace Software.Contraband.Inventory
         {
 #if UNITY_EDITOR
             // ReSharper disable once Unity.NoNullPropagation
-            if (Container?.manager is null)
+            if (Container?.Manager is null)
             {
                 throw new InvalidOperationException(
                     "A container hierarchy may only be one level deep, and only composed of slots.");
             }
 #endif
-            LostItemHandler = Container.manager.GetLostItemHandler();
+            LostItemHandler = Container.Manager.GetLostItemHandler();
         }
 
         public RectTransform GetRectTransform()
@@ -75,7 +75,7 @@ namespace Software.Contraband.Inventory
         }
 
         //for spawning an item to a slot
-        internal bool _InitSlotItem(GameObject item)
+        public bool InitSlotItem(GameObject item)
         {
             if (slotItem != null || !CheckCustomBehaviour(item)) return false;
             AddItemToSlot(item);
@@ -87,7 +87,7 @@ namespace Software.Contraband.Inventory
         }
 
         //for moving an item from another slot
-        public bool SetSlotItem(GameObject item)
+        internal bool SetSlotItem(GameObject item)
         {
             Item itemScript = item.GetComponent<Item>();
             Slot itemsPreviousSlot = itemScript.GetPreviousSlot();

@@ -17,7 +17,8 @@ namespace Software.Contraband.Inventory
         [Header("Inventory Object Containers")]
         
         [SerializeField] GameObject ContainerContainer;
-        [SerializeField] GameObject ItemContainer;
+
+        [field: SerializeField] public GameObject ItemContainer { get; private set; }
 
         private Dictionary<string, Container> containerIndex = new ();
 
@@ -26,6 +27,12 @@ namespace Software.Contraband.Inventory
             Debug.LogWarning("Lost Item: " + item.name + ", Destroying it...");
             Destroy(item.gameObject);
         };
+
+        internal void RegisterContainer(Container t)
+        {
+            t.Manager = this;
+            containerIndex.Add(t.gameObject.name, t);
+        }
 
         void Awake()
         {
@@ -43,9 +50,7 @@ namespace Software.Contraband.Inventory
                 if (child.gameObject.TryGetComponent<Container>(out t))
                 {
                     //containers.Add(t);
-                    t.manager = this;
-
-                    containerIndex.Add(child.gameObject.name, t);
+                    RegisterContainer(t);
                 }
 #if UNITY_EDITOR
                 else

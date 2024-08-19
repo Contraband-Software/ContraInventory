@@ -38,7 +38,7 @@ namespace Software.Contraband.Inventory
 
         private List<GameObject> itemCache = new List<GameObject>();
 
-        internal InventoryContainersManager manager = null;
+        public InventoryContainersManager Manager { get; internal set; } = null;
 
         public List<GameObject> GetItemsList()
         {
@@ -62,7 +62,7 @@ namespace Software.Contraband.Inventory
             if (itemSlotIndex.TryGetValue(SlotName, out IS))
             {
                 //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
-                bool res = IS._InitSlotItem(Item);
+                bool res = IS.InitSlotItem(Item);
 
                 //Debug.Log("slot.init res: " + res.ToString());
 
