@@ -82,6 +82,8 @@ namespace Software.Contraband.Inventory
 
         private bool isBeingDragged = false;
         private bool isFlying = false;
+        
+        public bool NotInSlot => isBeingDragged | isFlying;
 
         //Event locking
         private bool buttonLocked;
