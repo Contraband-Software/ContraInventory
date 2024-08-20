@@ -39,9 +39,9 @@ namespace Software.Contraband.Inventory
         //public StackSettings stackSettings;
         
         //Events
-        [FormerlySerializedAs("event_Slotted")] [Header("Events"), Space(10)]
-        public UnityEvent eventSlotted = new UnityEvent();
-        [FormerlySerializedAs("event_Unslotted")] public UnityEvent eventUnslotted = new UnityEvent();
+        [Header("Events"), Space(10)]
+        public UnityEvent eventSlotted = new();
+        public UnityEvent eventUnslotted = new();
 
         //State
         public Container Container { get; internal set; } = null;
@@ -173,8 +173,11 @@ namespace Software.Contraband.Inventory
 
         public void DestroyItem()
         {
-            Destroy(slotItem);
-            UnsetSlotItem();
+            if (slotItem != null)
+            {
+                Destroy(slotItem);
+                slotItem = null;
+            }
         }
 
         public void OnDrop(PointerEventData eventData)
