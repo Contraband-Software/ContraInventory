@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+[
+    RequireComponent(typeof(CanvasGroup))
+]
 public class MyItemBehaviour : MonoBehaviour
 {
     public Enums.SlotType slotType = Enums.SlotType.A;
