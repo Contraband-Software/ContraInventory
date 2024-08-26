@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Software.Contraband.Inventory
 {
-    public class InventoryContainersManager : MonoBehaviour
+    public sealed class InventoryContainersManager : MonoBehaviour
     {
         [Header("Prerequisites")]
         
@@ -96,7 +96,7 @@ namespace Software.Contraband.Inventory
         /// <param name="SlotName"></param>
         /// <param name="Item"></param>
         /// <returns>Whether the slotting was successful or not</returns>
-        public bool AddItem(string ContainerName, string SlotName, GameObject Item)
+        public bool AddItem(string ContainerName, string SlotName, Item Item)
         {
             Item.transform.SetParent(ItemContainer.transform);
             Item.GetComponent<Item>().SetCanvas(canvas);

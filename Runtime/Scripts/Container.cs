@@ -16,11 +16,11 @@ namespace Software.Contraband.Inventory
         Removed
     }
     
-    public class Container : MonoBehaviour
+    public sealed class Container : MonoBehaviour
     {
         //events
         [FormerlySerializedAs("event_Refresh")] [HideInInspector] 
-        public UnityEvent<SlotAction, GameObject> eventRefresh = new();
+        public UnityEvent<SlotAction, Item> eventRefresh = new();
 
         //settings
         [Serializable]
@@ -36,11 +36,11 @@ namespace Software.Contraband.Inventory
         //state
         private Dictionary<string, Slot> itemSlotIndex = new Dictionary<string, Slot>();
 
-        private List<GameObject> itemCache = new List<GameObject>();
+        private List<Item> itemCache = new List<Item>();
 
         public InventoryContainersManager Manager { get; internal set; } = null;
 
-        public List<GameObject> GetItemsList()
+        public List<Item> GetItemsList()
         {
             return itemCache;
         }
@@ -53,20 +53,20 @@ namespace Software.Contraband.Inventory
         /// <summary>
         /// Programatically adding item to slot
         /// </summary>
-        /// <param name="SlotName"></param>
-        /// <param name="Item"></param>
+        /// <param name="slotName"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        internal bool _AddItemToSlot(string SlotName, GameObject Item)
+        internal bool _AddItemToSlot(string slotName, Item item)
         {
             Slot IS;
-            if (itemSlotIndex.TryGetValue(SlotName, out IS))
+            if (itemSlotIndex.TryGetValue(slotName, out IS))
             {
                 //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
-                bool res = IS.InitSlotItem(Item);
+                bool res = IS.SpawnItem(item);
 
                 //Debug.Log("slot.init res: " + res.ToString());
 
-                ContainerRefreshEvent(SlotAction.Added, Item);
+                ContainerRefreshEvent(SlotAction.Added, item);
 
                 return res;
             }
@@ -74,7 +74,7 @@ namespace Software.Contraband.Inventory
             return false;
         }
         
-        private void ContainerRefreshEvent(SlotAction action, GameObject item)
+        private void ContainerRefreshEvent(SlotAction action, Item item)
         {
             // print("Refresh: " + item.name);
             
@@ -82,7 +82,7 @@ namespace Software.Contraband.Inventory
 
             foreach (KeyValuePair<string, Slot> child in itemSlotIndex)
             {
-                GameObject slotItem = child.Value.GetSlotItem();
+                Item slotItem = child.Value.SlotItem;
                 if (slotItem != null)
                 {
                     itemCache.Add(slotItem);
@@ -104,13 +104,12 @@ namespace Software.Contraband.Inventory
 
                     t.Container = this;
 
-                    t.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, t.GetSlotItem()));
-                    t.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, t.GetSlotItem()));
+                    t.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, t.SlotItem));
+                    t.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, t.SlotItem));
 
-                    GameObject slotItem = t.GetSlotItem();
-                    if (slotItem != null)
+                    if (t.SlotItem != null)
                     {
-                        itemCache.Add(slotItem);
+                        itemCache.Add(t.SlotItem);
                     }
                 }
             }

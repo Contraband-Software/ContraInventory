@@ -13,7 +13,7 @@ namespace Software.Contraband.Inventory
         RequireComponent(typeof(CanvasGroup)),
         SelectionBase
     ]
-    public class Item : 
+    public sealed class Item : 
         MonoBehaviour, 
         IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
     {
@@ -116,15 +116,15 @@ namespace Software.Contraband.Inventory
         /// Just spawns an item in a slot
         /// </summary>
         /// <param name="newSlot"></param>
-        internal void _InitSlot(Slot newSlot)
+        internal void SpawnInSlot(Slot newSlot)
         {
             SetPreviousSlot(newSlot);
             slot = newSlot;
 
-            //MoveToPosition(newSlot.GetRectTransform().anchoredPosition);
+            //MoveToPosition(newSlot.rectTransform.anchoredPosition);
 
-            rectTransform.anchoredPosition = newSlot.GetRectTransform().anchoredPosition;
-            desiredPosition = newSlot.GetRectTransform().anchoredPosition;
+            rectTransform.anchoredPosition = newSlot.RectTransform.anchoredPosition;
+            desiredPosition = newSlot.RectTransform.anchoredPosition;
         }
         
         private void SetPreviousSlot(Slot newSlot)
@@ -133,20 +133,20 @@ namespace Software.Contraband.Inventory
             previousFloatSlot = newSlot;
         }
         
-        private void _SetCurrentSlot(Slot newSlot)
+        private void SetCurrentSlot(Slot newSlot)
         {
             slot = newSlot;
         }
 
         /// <summary>
-        /// For the slot script to bind the item
+        /// Called when an item meets its slot
         /// </summary>
         /// <param name="newSlot"></param>
-        internal void _AddToSlot(Slot newSlot)
+        internal void SetSlot(Slot newSlot)
         {
-            _SetCurrentSlot(newSlot);
+            SetCurrentSlot(newSlot);
             eventSlotted.Invoke();
-            MoveToPosition(newSlot.GetRectTransform().anchoredPosition);
+            MoveToPosition(newSlot.RectTransform.anchoredPosition);
 
             //just in case, could be removed
             ToggleDrag(false);
@@ -169,7 +169,8 @@ namespace Software.Contraband.Inventory
         public Slot GetPreviousFloatSlot() => previousFloatSlot;
 
         //event handlers
-        public void OnBeginDrag(PointerEventData eventData)
+        
+        void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
         {
             //blocked due to click limiting
             if (buttonLocked)
@@ -197,14 +198,14 @@ namespace Software.Contraband.Inventory
 
                 if (slot)
                 {
-                    slot.UnsetSlotItem();
+                    slot.UnsetItem();
                 }
 
                 //remember the slot we are departing from
                 SetPreviousSlot(slot);
 
                 //we are currently not in a slot
-                _SetCurrentSlot(null);
+                SetCurrentSlot(null);
 
                 //fire events
                 eventUnslotted.Invoke();
@@ -216,19 +217,20 @@ namespace Software.Contraband.Inventory
                 eventData.pointerDrag = null;
             }
         }
-        public void OnDrag(PointerEventData eventData)
+        void IDragHandler.OnDrag(PointerEventData eventData)
         {
             //Move the item with respect to the canvas scaling (affects positioning)
             rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         }
-        public void OnEndDrag(PointerEventData eventData)
+        
+        void IEndDragHandler.OnEndDrag(PointerEventData eventData)
         {
             if (slot == null)
             {
                 //return the item back to its original slot, as it has not been put into a valid new one
-                previousSlot.SetSlotItem(this.gameObject);
+                previousSlot.TrySetItem(this.gameObject);
 
-                _SetCurrentSlot(previousSlot);
+                SetCurrentSlot(previousSlot);
 
                 //fire events
                 eventReslotted.Invoke();
@@ -236,17 +238,20 @@ namespace Software.Contraband.Inventory
 
             ToggleDrag(false);
         }
-        public void OnDrop(PointerEventData eventData)
+        
+        void IDropHandler.OnDrop(PointerEventData eventData)
         {
             //not captured by this script, captured by the ItemSlot script on the recieving end
             //the method still must exist even if it is empty as unity forces you to define it
         }
-        public void OnPointerDown(PointerEventData eventData)
+        
+        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
             // Debug.Log("Pointer Down: " + mouseDown);
             //event_mouseDown.Invoke();
         }
-        public void OnPointerUp(PointerEventData eventData)
+        
+        void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
         {
             //Debug.Log("Pointer Up");
         }
@@ -256,14 +261,6 @@ namespace Software.Contraband.Inventory
             isFlying = true;
             desiredPosition = pos;
         }
-
-        // private void FixedUpdate()
-        // {
-        //     if (!isBeingDragged)// && isFlying == false)
-        //     {
-        //
-        //     }
-        // }
 
         private void Update()
         {

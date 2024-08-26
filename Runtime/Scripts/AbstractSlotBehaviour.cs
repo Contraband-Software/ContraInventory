@@ -12,7 +12,7 @@ namespace Software.Contraband.Inventory
         /// </summary>
         /// <param name="item">The item being added to this slot</param>
         /// <returns>Whether the item can be put here or not</returns>
-        public abstract bool CanItemSlot(Slot slot, GameObject item);//, GameObject slot
+        public abstract bool CanItemSlot(Slot slot, Item item);//, GameObject slot
     }
 }
 

@@ -12,7 +12,7 @@ namespace Software.Contraband.Inventory
         RequireComponent(typeof(RectTransform)),
         SelectionBase
     ]
-    public class Slot : MonoBehaviour, IDropHandler, IDragHandler
+    public sealed class Slot : MonoBehaviour, IDropHandler, IDragHandler
     {
 
         //Settings
@@ -45,17 +45,19 @@ namespace Software.Contraband.Inventory
 
         //State
         public Container Container { get; internal set; } = null;
-        private GameObject slotItem = null;
-        private RectTransform rectTransformComponent;
+        public Item SlotItem { get; private set; } = null;
+        public RectTransform RectTransform { get; private set; }
 
-        private Action<Item> LostItemHandler;
+        private Action<Item> lostItemHandler;
 
+        #region Unity Callbacks
         private void Awake()
         {
             gameObject.tag = "InventorySystemSlot";
 
-            rectTransformComponent = GetComponent<RectTransform>();
+            RectTransform = GetComponent<RectTransform>();
         }
+        
         private void Start()
         {
 #if UNITY_EDITOR
@@ -66,28 +68,39 @@ namespace Software.Contraband.Inventory
                     "A container hierarchy may only be one level deep, and only composed of slots.");
             }
 #endif
-            LostItemHandler = Container.Manager.GetLostItemHandler();
+            lostItemHandler = Container.Manager.GetLostItemHandler();
         }
+        #endregion
 
-        public RectTransform GetRectTransform()
+        #region Public API
+        /// <summary>
+        /// Spawns an item in a slot
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool SpawnItem(Item item)
         {
-            return rectTransformComponent;
-        }
-
-        //for spawning an item to a slot
-        public bool InitSlotItem(GameObject item)
-        {
-            if (slotItem != null || !CheckCustomBehaviour(item)) return false;
-            AddItemToSlot(item);
+            if (SlotItem != null || !CheckCustomBehaviour(item)) return false;
+            SetItem(item);
             //Debug.Log("Slot allowed item: " + item.name);
-            item.GetComponent<Item>()._InitSlot(this);
+            item.SpawnInSlot(this);
             return true;
 
             //Debug.Log("init: " + item.name + " " + gameObject.name);
         }
 
+        public void DestroyItem()
+        {
+            if (SlotItem != null)
+            {
+                Destroy(SlotItem.gameObject);
+                SlotItem = null;
+            }
+        }
+        #endregion
+
         //for moving an item from another slot
-        internal bool SetSlotItem(GameObject item)
+        internal bool TrySetItem(GameObject item)
         {
             Item itemScript = item.GetComponent<Item>();
             Slot itemsPreviousSlot = itemScript.GetPreviousSlot();
@@ -109,39 +122,39 @@ namespace Software.Contraband.Inventory
             
             // print("isolation passed");
             
-            if (!CheckCustomBehaviour(item)) return false;
+            if (!CheckCustomBehaviour(itemScript)) return false;
 
             // empty slot
-            if (slotItem == null)
+            if (SlotItem == null)
             {
                 // print("slot empty");
-                itemScript._AddToSlot(this);
-                AddItemToSlot(item);
+                itemScript.SetSlot(this);
+                SetItem(itemScript);
                 return true;
             }
             
             // print("slot blocked");
 
             // empty source slot means we can swap the items
-            if (itemsPreviousSlot.GetSlotItem() == null)
+            if (itemsPreviousSlot.SlotItem == null)
             {
                 // print("prev slot available");
                 
                 // try to swap the items
-                if (!itemsPreviousSlot.SetSlotItem(slotItem)) return false;
+                if (!itemsPreviousSlot.TrySetItem(SlotItem.gameObject)) return false;
                 
-                itemScript._AddToSlot(this);
-                AddItemToSlot(item);
+                itemScript.SetSlot(this);
+                SetItem(itemScript);
                 return true;
             }
 
             //Deal with item
-            LostItemHandler?.Invoke(itemScript);
+            lostItemHandler?.Invoke(itemScript);
 
             return false;
         }
 
-        private bool CheckCustomBehaviour(GameObject item)
+        private bool CheckCustomBehaviour(Item item)
         {
             //custom logic
             if (!CustomSlotBehaviour.Enabled)
@@ -151,36 +164,22 @@ namespace Software.Contraband.Inventory
         }
 
         //core logic that applies to both initialising and moving
-        private void AddItemToSlot(GameObject item)
+        private void SetItem(Item item)
         {
-            slotItem = item;
+            SlotItem = item;
             eventSlotted.Invoke();
         }
 
-        public GameObject GetSlotItem()
-        {
-            return slotItem;
-        }
-
         //for when an item is removed from a slot
-        internal void UnsetSlotItem()
+        internal void UnsetItem()
         {
             //slotItem.GetComponent<InventorySystemItem>().SetSlot(null);
-            slotItem = null;
+            SlotItem = null;
             
             eventUnslotted.Invoke();
         }
 
-        public void DestroyItem()
-        {
-            if (slotItem != null)
-            {
-                Destroy(slotItem);
-                slotItem = null;
-            }
-        }
-
-        public void OnDrop(PointerEventData eventData)
+        void IDropHandler.OnDrop(PointerEventData eventData)
         {
             //fire a custom event saying that a slot has been updated within the inventory system
             //this needs to check if the pointer drag item is a compatible inventory system item,
@@ -188,14 +187,11 @@ namespace Software.Contraband.Inventory
             if (eventData.pointerDrag != null && eventData.pointerDrag.CompareTag("InventorySystemItem"))
             {
                 //Debug.Log("Tried to drop in slot");
-                SetSlotItem(eventData.pointerDrag);
+                TrySetItem(eventData.pointerDrag);
             }
         }
 
-        public void OnDrag(PointerEventData eventData)
-        {
-            
-        }
+        void IDragHandler.OnDrag(PointerEventData eventData) { }
     }
 }
 

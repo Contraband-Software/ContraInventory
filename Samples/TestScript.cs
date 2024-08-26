@@ -24,7 +24,7 @@ public class TestScript : MonoBehaviour
         newItem.name = "newItem3";
         newItem.GetComponent<MyItemBehaviour>().slotType = Enums.SlotType.C;
 
-        Debug.Log("ADD ITEM (EXTERNAL): " + IM.AddItem("ContainerTest", "Slot_C_1", newItem));
+        Debug.Log("ADD ITEM (EXTERNAL): " + IM.AddItem("ContainerTest", "Slot_C_1", newItem.GetComponent<Item>()));
 
         //works: Debug.Log(IM.GetContainer("ContainerTest").GetItems().Count);
     }
@@ -32,10 +32,10 @@ public class TestScript : MonoBehaviour
     void onRefresh()
     {
         string listofitems = "";
-        List<GameObject> items = IC.GetItemsList();
-        foreach (GameObject item in items)
+        List<Item> items = IC.GetItemsList();
+        foreach (Item item in items)
         {
-            listofitems += item.name + ", ";
+            listofitems += item.gameObject.name + ", ";
         }
         //Debug.Log(listofitems);
     }

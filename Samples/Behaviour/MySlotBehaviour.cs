@@ -13,7 +13,7 @@ public class MySlotBehaviour : Software.Contraband.Inventory.AbstractSlotBehavio
     {
         te.GetComponent<TextMeshProUGUI>().text = slotType.ToString();
     }
-    public override bool CanItemSlot(Slot _, GameObject item)
+    public override bool CanItemSlot(Slot _, Item item)
     {
         return slotType == item.GetComponent<MyItemBehaviour>().slotType;
     }

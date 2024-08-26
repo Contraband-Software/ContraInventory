@@ -24,7 +24,7 @@ namespace Software.Contraband.Inventory
                 if (!pair.Item.TryGetComponent<Item>(out _))
                     throw new InvalidOperationException("Tried to initialize slot with a non-item gameObject");
 #endif
-                if (!pair.ItemSlot.InitSlotItem(pair.Item))
+                if (!pair.ItemSlot.SpawnItem(pair.Item.GetComponent<Item>()))
                 {
                     Debug.LogException(new Exception("Cannot init item to this slot"));
                 }
