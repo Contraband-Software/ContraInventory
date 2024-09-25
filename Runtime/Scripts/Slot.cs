@@ -53,13 +53,10 @@ namespace Software.Contraband.Inventory
         #region Unity Callbacks
         private void Awake()
         {
-            gameObject.tag = "InventorySystemSlot";
-
             RectTransform = GetComponent<RectTransform>();
-        }
-        
-        private void Start()
-        {
+            
+            gameObject.tag = "InventorySystemSlot";
+            
 #if UNITY_EDITOR
             // ReSharper disable once Unity.NoNullPropagation
             if (Container?.Manager is null)
@@ -68,7 +65,7 @@ namespace Software.Contraband.Inventory
                     "A container hierarchy may only be one level deep, and only composed of slots.");
             }
 #endif
-            lostItemHandler = Container.Manager.GetLostItemHandler();
+            lostItemHandler = Container.Manager.LostItemHandler;
         }
         #endregion
 
@@ -81,21 +78,18 @@ namespace Software.Contraband.Inventory
         public bool SpawnItem(Item item)
         {
             if (SlotItem != null || !CheckCustomBehaviour(item)) return false;
+            
             SetItem(item);
-            //Debug.Log("Slot allowed item: " + item.name);
             item.SpawnInSlot(this);
+            
             return true;
-
-            //Debug.Log("init: " + item.name + " " + gameObject.name);
         }
 
         public void DestroyItem()
         {
-            if (SlotItem != null)
-            {
-                Destroy(SlotItem.gameObject);
-                SlotItem = null;
-            }
+            if (!SlotItem) return;
+            Destroy(SlotItem.gameObject);
+            SlotItem = null;
         }
         #endregion
 
@@ -103,43 +97,38 @@ namespace Software.Contraband.Inventory
         internal bool TrySetItem(GameObject item)
         {
             Item itemScript = item.GetComponent<Item>();
-            Slot itemsPreviousSlot = itemScript.GetPreviousSlot();
+            Slot itemsPreviousSlot = itemScript.PreviousSlot;
 
-            //isolation
+#if UNITY_EDITOR
             if (itemsPreviousSlot == null)
-            {
                 throw new InvalidOperationException("itemScript.GetPreviousSlot() == null");
-            }
+#endif
+            
+            //isolation
             Container previousSlotContainer = itemsPreviousSlot.Container;
             if (Container.IsolationSettings.Enabled || previousSlotContainer.IsolationSettings.Enabled)
-            {//if either are isolated
-                //compare identifiers
-                if (previousSlotContainer.IsolationSettings.Identifier != Container.IsolationSettings.Identifier)
+            {
+                //if either are isolated, compare identifiers
+                if (previousSlotContainer.IsolationSettings.Identifier != 
+                    Container.IsolationSettings.Identifier)
                 {
                     return false;
                 }
             }
-            
-            // print("isolation passed");
             
             if (!CheckCustomBehaviour(itemScript)) return false;
 
             // empty slot
             if (SlotItem == null)
             {
-                // print("slot empty");
                 itemScript.SetSlot(this);
                 SetItem(itemScript);
                 return true;
             }
             
-            // print("slot blocked");
-
             // empty source slot means we can swap the items
             if (itemsPreviousSlot.SlotItem == null)
             {
-                // print("prev slot available");
-                
                 // try to swap the items
                 if (!itemsPreviousSlot.TrySetItem(SlotItem.gameObject)) return false;
                 

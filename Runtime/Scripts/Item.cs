@@ -17,14 +17,6 @@ namespace Software.Contraband.Inventory
         MonoBehaviour, 
         IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
     {
-        //the object is just clicked, not dragged
-        //[HideInInspector] public UnityEvent event_mouseDown = new UnityEvent();
-
-        //Prerequisites
-        //[Header("Prerequisites")]
-        //[Tooltip("The UI canvas this inventory system operates on")]
-        private Canvas canvas;
-
         //Settings
         [Header("Settings"), Space(10)]
         
@@ -71,46 +63,60 @@ namespace Software.Contraband.Inventory
         [FormerlySerializedAs("event_Slotted")] public UnityEvent eventSlotted = new UnityEvent();
 
         //State
+        #region Public State
+        public Canvas Canvas { get; internal set; }
+        
+        public Slot Slot { get; private set; } = null;
+        public Slot PreviousSlot { get; private set; } = null;
+        /// <summary>
+        /// Only difference between this and GetPreviousSlot() is that it is set to GetCurrentSlot() after it
+        /// has settled in a slot, useful for custom slot behaviours who want to check if an item was from the same
+        /// container as that slot.
+        /// </summary>
+        /// <returns></returns>
+        public Slot PreviousFloatSlot { get; private set; } = null;
+        
+        /// <summary>
+        /// Returns if the item is visually set in its slot.
+        /// </summary>
+        public bool NotVisuallyInSlot => isBeingDragged | isFlying;
+        #endregion
+        
         private RectTransform rectTransform;
         private CanvasGroup cg;
 
         private Vector2 desiredPosition;
 
-        private Slot previousSlot = null;
-        private Slot previousFloatSlot = null;
-        private Slot slot = null;
-
         private bool isBeingDragged = false;
         private bool isFlying = false;
-        
-        public bool NotInSlot => isBeingDragged | isFlying;
 
         //Event locking
         private bool buttonLocked;
         private System.Timers.Timer timer;
-        private void ResetFlag(object source, System.Timers.ElapsedEventArgs e)
+        private void ClickLockResetCallback(object source, System.Timers.ElapsedEventArgs e)
         {
             buttonLocked = false;
             timer.Enabled = false;
         }
 
-        //unity
+        #region Unity Callbacks
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
             cg = GetComponent<CanvasGroup>();
 
             timer = new System.Timers.Timer(ClickLockingTime);
-            timer.Elapsed += ResetFlag;
+            timer.Elapsed += ClickLockResetCallback;
             gameObject.tag = "InventorySystemItem";
 
             desiredPosition = rectTransform.anchoredPosition;
         }
-        
-        private void Start()
+
+        private void OnEnable()
         {
-            canvas = GetComponentInParent<InventoryContainersManager>().GetCanvas();
+            Canvas = GetComponentInParent<InventoryContainersManager>().Canvas;
         }
+        #endregion
 
         /// <summary>
         /// Just spawns an item in a slot
@@ -119,7 +125,7 @@ namespace Software.Contraband.Inventory
         internal void SpawnInSlot(Slot newSlot)
         {
             SetPreviousSlot(newSlot);
-            slot = newSlot;
+            Slot = newSlot;
 
             //MoveToPosition(newSlot.rectTransform.anchoredPosition);
 
@@ -129,13 +135,8 @@ namespace Software.Contraband.Inventory
         
         private void SetPreviousSlot(Slot newSlot)
         {
-            previousSlot = newSlot;
-            previousFloatSlot = newSlot;
-        }
-        
-        private void SetCurrentSlot(Slot newSlot)
-        {
-            slot = newSlot;
+            PreviousSlot = newSlot;
+            PreviousFloatSlot = newSlot;
         }
 
         /// <summary>
@@ -144,29 +145,15 @@ namespace Software.Contraband.Inventory
         /// <param name="newSlot"></param>
         internal void SetSlot(Slot newSlot)
         {
-            SetCurrentSlot(newSlot);
+            Slot = newSlot;
             eventSlotted.Invoke();
             MoveToPosition(newSlot.RectTransform.anchoredPosition);
 
             //just in case, could be removed
             ToggleDrag(false);
             
-            previousFloatSlot = newSlot;
+            PreviousFloatSlot = newSlot;
         }
-
-        public void SetCanvas(Canvas newcanvas) => canvas = newcanvas;
-
-        public Slot GetCurrentSlot() => slot;
-
-        public Slot GetPreviousSlot() => previousSlot;
-
-        /// <summary>
-        /// Only difference between this and GetPreviousSlot() is that it is set to GetCurrentSlot() after it
-        /// has settled in a slot, useful for custom slot behaviours who want to check if an item was from the same
-        /// container as that slot.
-        /// </summary>
-        /// <returns></returns>
-        public Slot GetPreviousFloatSlot() => previousFloatSlot;
 
         //event handlers
         
@@ -196,16 +183,16 @@ namespace Software.Contraband.Inventory
 
                 ToggleDrag(true);
 
-                if (slot)
+                if (Slot)
                 {
-                    slot.UnsetItem();
+                    Slot.UnsetItem();
                 }
 
                 //remember the slot we are departing from
-                SetPreviousSlot(slot);
+                SetPreviousSlot(Slot);
 
                 //we are currently not in a slot
-                SetCurrentSlot(null);
+                Slot = null;
 
                 //fire events
                 eventUnslotted.Invoke();
@@ -220,17 +207,17 @@ namespace Software.Contraband.Inventory
         void IDragHandler.OnDrag(PointerEventData eventData)
         {
             //Move the item with respect to the canvas scaling (affects positioning)
-            rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+            rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
         }
         
         void IEndDragHandler.OnEndDrag(PointerEventData eventData)
         {
-            if (slot == null)
+            if (Slot == null)
             {
                 //return the item back to its original slot, as it has not been put into a valid new one
-                previousSlot.TrySetItem(this.gameObject);
+                PreviousSlot.TrySetItem(this.gameObject);
 
-                SetCurrentSlot(previousSlot);
+                Slot = PreviousSlot;
 
                 //fire events
                 eventReslotted.Invoke();

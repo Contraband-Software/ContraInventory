@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Software.Contraband.Inventory;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public class TestScript : MonoBehaviour
     void Start()
     {
         IC = IM.GetContainer("Container1");
-        IC.eventRefresh.AddListener((_, _) => onRefresh());
+        IC.EventRefresh.AddListener((_, _) => onRefresh());
 
         newItem = Instantiate(item);//, IM.GetCanvas().transform);
         newItem.name = "newItem3";
@@ -32,7 +33,7 @@ public class TestScript : MonoBehaviour
     void onRefresh()
     {
         string listofitems = "";
-        List<Item> items = IC.GetItemsList();
+        ReadOnlyCollection<Item> items = IC.Items;
         foreach (Item item in items)
         {
             listofitems += item.gameObject.name + ", ";

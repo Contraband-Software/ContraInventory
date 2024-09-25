@@ -25,5 +25,8 @@
       "description": "Contains sample secondary bahaviour scripts for the cyan inventory system package.",
       "path": "Samples~/Behaviour"
     }
-  ]
+  ],
+  "dependencies": {
+    "software.contraband.editor": "1.0.0"
+  }
 }

@@ -4,87 +4,59 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Software.Contraband.Inventory
 {
     public sealed class InventoryContainersManager : MonoBehaviour
     {
-        [Header("Prerequisites")]
-        
-        [Tooltip("The UI canvas this inventory system operates on, should be a direct parent for a clean project")]
-        [SerializeField] private Canvas canvas;
+        #region Public Fields and State
+        [field: Header("References")]
+        [field: Tooltip("The UI canvas this inventory system operates on, " +
+                        "should be a direct parent for a clean project")]
+        [field: FormerlySerializedAs("canvas"), SerializeField] 
+        public Canvas Canvas { get; private set; }
 
         [Header("Inventory Object Containers")]
-        
-        [SerializeField] GameObject ContainerContainer;
-
+        [SerializeField, FormerlySerializedAs("ContainerContainer")]
+        private GameObject containerContainer;
         [field: SerializeField] public GameObject ItemContainer { get; private set; }
 
-        private Dictionary<string, Container> containerIndex = new ();
-
-        private Action<Item> lostItemHandler = (Item item) =>
+        public Action<Item> LostItemHandler { internal get; set; } = (Item item) =>
         {
             Debug.LogWarning("Lost Item: " + item.name + ", Destroying it...");
             Destroy(item.gameObject);
         };
+        #endregion
 
-        internal void RegisterContainer(Container t)
-        {
-            t.Manager = this;
-            containerIndex.Add(t.gameObject.name, t);
-        }
+        // State
+        private readonly Dictionary<string, Container> containerNameMap = new ();
 
-        void Awake()
+        #region Unity Callbacks
+        private void Awake()
         {
 #if UNITY_EDITOR
-            if (canvas == null)
-            {
+            if (Canvas == null)
                 throw new InvalidOperationException("Inventory system canvas not assigned");
-            }
 #endif
-
-            //get a reference cache to all the containers in the system
-            foreach (Transform child in ContainerContainer.transform)
-            {
-                Container t;
-                if (child.gameObject.TryGetComponent<Container>(out t))
-                {
-                    //containers.Add(t);
-                    RegisterContainer(t);
-                }
-#if UNITY_EDITOR
-                else
-                {
-                    throw new InvalidOperationException(
-                        "NON-InventorySystemContainer GameObject within container hierarchy");
-                }
-#endif
-            }
+            RegisterChildContainers();
         }
 
-        public void SetLostItemHandler(Action<Item> handler)
+        private void OnTransformChildrenChanged()
         {
-            lostItemHandler = handler;
+            RegisterChildContainers();
         }
-        
-        public Action<Item> GetLostItemHandler()
+        #endregion
+
+        #region Public API
+        public Container GetContainer(string containerName)
         {
-            return lostItemHandler;
+            return containerNameMap[containerName];
         }
 
-        public Container GetContainer(string ContainerName)
+        public IReadOnlyDictionary<string, Slot> GetContainerMap(string containerName)
         {
-            return containerIndex[ContainerName];
-        }
-
-        public Dictionary<string, Slot> GetContainerMap(string ContainerName)
-        {
-            return containerIndex[ContainerName].GetContainerMap();
-        }
-
-        public Canvas GetCanvas()
-        {
-            return canvas;
+            return containerNameMap[containerName].SlotNameMap;
         }
 
         /// <summary>
@@ -92,28 +64,32 @@ namespace Software.Contraband.Inventory
         /// as well as parenting the object to the item container Object.
         /// The item gameObject must already be parented to the same canvas as the target inventory system.
         /// </summary>
-        /// <param name="ContainerName"></param>
-        /// <param name="SlotName"></param>
-        /// <param name="Item"></param>
+        /// <param name="containerName"></param>
+        /// <param name="slotName"></param>
+        /// <param name="item"></param>
         /// <returns>Whether the slotting was successful or not</returns>
-        public bool AddItem(string ContainerName, string SlotName, Item Item)
+        public bool AddItem(string containerName, string slotName, Item item)
         {
-            Item.transform.SetParent(ItemContainer.transform);
-            Item.GetComponent<Item>().SetCanvas(canvas);
+            item.transform.SetParent(ItemContainer.transform);
+            item.GetComponent<Item>().Canvas = Canvas;
 
-            Container IC;
-            if (containerIndex.TryGetValue(ContainerName, out IC))
-            {
-                //Debug.Log("IM: TryGetValue - CONTAINER FOUND; " + ContainerName);
-                if (IC._AddItemToSlot(SlotName, Item))
-                {
-                    return true;
-                }
+            if (!containerNameMap.TryGetValue(containerName, out Container ic)) return false;
+            
+            return ic.AddItemToSlot(slotName, item);
+        }
+        #endregion
 
-                return false;
-            }
+        private void RegisterChildContainers()
+        {
+            containerNameMap.Clear();
+            foreach (Container cont in containerContainer.GetComponentsInChildren<Container>(true))
+                RegisterContainer(cont);
+        }
 
-            return false;
+        private void RegisterContainer(Container t)
+        {
+            t.Manager = this;
+            containerNameMap.Add(t.gameObject.name, t);
         }
     }
 }

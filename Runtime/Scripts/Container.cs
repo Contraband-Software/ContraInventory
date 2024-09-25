@@ -7,6 +7,9 @@ using UnityEngine.EventSystems;
 using UnityEditor;
 using UnityEngine.Serialization;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Software.Contraband.Editor;
 
 namespace Software.Contraband.Inventory
 {
@@ -19,8 +22,8 @@ namespace Software.Contraband.Inventory
     public sealed class Container : MonoBehaviour
     {
         //events
-        [FormerlySerializedAs("event_Refresh")] [HideInInspector] 
-        public UnityEvent<SlotAction, Item> eventRefresh = new();
+        [FormerlySerializedAs("event_Refresh")]
+        public readonly UnityEvent<SlotAction, Item> EventRefresh = new();
 
         //settings
         [Serializable]
@@ -34,21 +37,34 @@ namespace Software.Contraband.Inventory
         [field: SerializeField] public OptionalIsolationSettings IsolationSettings { get; private set; }
 
         //state
-        private Dictionary<string, Slot> itemSlotIndex = new Dictionary<string, Slot>();
-
-        private List<Item> itemCache = new List<Item>();
-
+        [SerializeField, ReadOnly]
+        private List<Item> items = new();
+        private readonly Dictionary<string, Slot> slotNameMap = new();
+        
         public InventoryContainersManager Manager { get; internal set; } = null;
+        public IReadOnlyDictionary<string, Slot> SlotNameMap { get; private set; }
+        public ReadOnlyCollection<Item> Items { get; private set; }
 
-        public List<Item> GetItemsList()
+        #region Unity Callbacks
+        private void Awake()
         {
-            return itemCache;
+            Items = items.AsReadOnly();
+            SlotNameMap = slotNameMap;
+
+            RegisterChildSlots();
         }
 
-        public Dictionary<string, Slot> GetContainerMap()
+        private void OnTransformChildrenChanged()
         {
-            return itemSlotIndex;
+            RegisterChildSlots();
         }
+
+        private void OnEnable()
+        {
+            RegisterChildSlots();
+        }
+
+        #endregion
 
         /// <summary>
         /// Programatically adding item to slot
@@ -56,63 +72,51 @@ namespace Software.Contraband.Inventory
         /// <param name="slotName"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal bool _AddItemToSlot(string slotName, Item item)
+        internal bool AddItemToSlot(string slotName, Item item)
         {
-            Slot IS;
-            if (itemSlotIndex.TryGetValue(slotName, out IS))
-            {
-                //Debug.Log("_AddItemToSlot: SLOT FOUND FOR " + Item.name + "; " + SlotName);
-                bool res = IS.SpawnItem(item);
+            if (!slotNameMap.TryGetValue(slotName, out Slot slot)) return false;
+            
+            bool res = slot.SpawnItem(item);
 
-                //Debug.Log("slot.init res: " + res.ToString());
+            ContainerRefreshEvent(SlotAction.Added, item);
 
-                ContainerRefreshEvent(SlotAction.Added, item);
+            return res;
+        }
 
-                return res;
-            }
+        private void RegisterChildSlots()
+        {
+            slotNameMap.Clear();
+            
+            //grab a reference to the item slot script for all the item slots in this container,
+            //as well as initialising the item cache, and adding its own reference and event handlers
+            foreach (Slot slot in GetComponentsInChildren<Slot>(true))
+                RegisterSlot(slot);
+        }
+        
+        private void RegisterSlot(Slot slot)
+        {
+            slotNameMap.Add(slot.gameObject.name, slot);
 
-            return false;
+            slot.Container = this;
+
+            slot.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, slot.SlotItem));
+            slot.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, slot.SlotItem));
+
+            if (slot.SlotItem != null)
+                items.Add(slot.SlotItem);
         }
         
         private void ContainerRefreshEvent(SlotAction action, Item item)
         {
-            // print("Refresh: " + item.name);
+            items.Clear();
+
+            foreach (Item slotItem in 
+                     slotNameMap
+                         .Select(child => child.Value.SlotItem)
+                         .Where(slotItem => slotItem != null))
+                items.Add(slotItem);
             
-            itemCache.Clear();
-
-            foreach (KeyValuePair<string, Slot> child in itemSlotIndex)
-            {
-                Item slotItem = child.Value.SlotItem;
-                if (slotItem != null)
-                {
-                    itemCache.Add(slotItem);
-                }
-            }
-            eventRefresh.Invoke(action, item);
-        }
-
-        void Awake()
-        {
-            //grab a reference to the item slot script for all the item slots in this container,
-            //as well as initialising the item cache, and adding its own reference and event handlers
-            foreach (Transform child in transform)
-            {
-                Slot t;
-                if (child.gameObject.TryGetComponent<Slot>(out t))
-                {
-                    itemSlotIndex.Add(child.gameObject.name, t);
-
-                    t.Container = this;
-
-                    t.eventSlotted.AddListener(() => ContainerRefreshEvent(SlotAction.Added, t.SlotItem));
-                    t.eventUnslotted.AddListener(() => ContainerRefreshEvent(SlotAction.Removed, t.SlotItem));
-
-                    if (t.SlotItem != null)
-                    {
-                        itemCache.Add(t.SlotItem);
-                    }
-                }
-            }
+            EventRefresh.Invoke(action, item);
         }
     }
 }
